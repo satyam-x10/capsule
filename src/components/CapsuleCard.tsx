@@ -14,7 +14,7 @@ export function CapsuleCard({ capsule }: CapsuleCardProps) {
   const router = useRouter();
 
   const handlePress = () => {
-    router.push(`/capsule/${capsule.id}` as any);
+    router.push(`/capsule/${capsule.id}?date=${capsule.date}` as any);
   };
 
   return (

@@ -2,6 +2,7 @@ import { Spacing } from '@/constants/theme';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
+import { formatDateString } from '@/utils/dateHelper';
 
 interface DateNavigatorProps {
   selectedDate: string;
@@ -27,19 +28,6 @@ export function DateNavigator({ selectedDate, onDateChange, availableDates }: Da
     }
   };
 
-  // Format the date into a human readable format, e.g. "Wednesday, May 27, 2026"
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr + 'T00:00:00');
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
-  };
 
   return (
     <ThemedView style={styles.container}>
@@ -58,9 +46,11 @@ export function DateNavigator({ selectedDate, onDateChange, availableDates }: Da
       </Pressable>
 
       <View style={styles.dateLabelContainer}>
-
+        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.subtext}>
+          DAILY ISSUE
+        </ThemedText>
         <ThemedText type="default" style={styles.dateText}>
-          {formatDate(selectedDate)}
+          {formatDateString(selectedDate)}
         </ThemedText>
       </View>
 

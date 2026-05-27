@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Platform, ScrollView, StyleSheet, Pressable, View } from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Platform, ScrollView, StyleSheet, Pressable, View, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
@@ -9,37 +9,57 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { capsules } from '@/data/capsules';
+import { useCapsules } from '@/context/CapsuleContext';
+import { getCurrentMonthId } from '@/services/capsuleApi';
+import { generateDatesForMonth } from '@/utils/dateHelper';
+
+const VALID_CATEGORIES = [
+  'AI & ML',
+  'Data Structures & Algorithms',
+  'System Design',
+  'Database Internals',
+  'Web Performance & Networking'
+];
 
 export default function SectionDetailScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category: string }>();
+  const { dailyCapsules, isLoading, fetchDayCapsules } = useCapsules();
 
-  // Filter capsules by this category
-  const sectionCapsules = useMemo(() => {
-    if (!category) return [];
-    // Decode URI component if category contains special characters like "&"
-    const decodedCategory = decodeURIComponent(category);
-    return capsules.filter((c) => c.category === decodedCategory);
+  const decodedCategory = useMemo(() => {
+    return category ? decodeURIComponent(category) : '';
   }, [category]);
 
-  // Extract unique sorted dates for this category
-  const availableDates = useMemo(() => {
-    return Array.from(new Set(sectionCapsules.map((c) => c.date))).sort();
-  }, [sectionCapsules]);
+  const isValidSection = useMemo(() => {
+    return VALID_CATEGORIES.includes(decodedCategory);
+  }, [decodedCategory]);
 
-  // Initialize selected date to the latest available date for this category
+  // Generate available days for the current calendar month
+  const availableDates = useMemo(() => {
+    const monthId = getCurrentMonthId();
+    return generateDatesForMonth(monthId);
+  }, []);
+
+  // Selected date state (defaults to the latest day)
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return availableDates[availableDates.length - 1] || '';
   });
 
-  // Filtered capsule(s) for the selected date
-  const activeCapsules = useMemo(() => {
-    return sectionCapsules.filter((c) => c.date === selectedDate);
-  }, [sectionCapsules, selectedDate]);
+  // Fetch the daily capsule for the selected date on-demand
+  useEffect(() => {
+    if (selectedDate && isValidSection) {
+      fetchDayCapsules(selectedDate);
+    }
+  }, [selectedDate, isValidSection]);
 
-  if (!category || sectionCapsules.length === 0) {
+  // Get the active capsule for this section on the selected date
+  const activeCapsule = useMemo(() => {
+    const dayCapsules = dailyCapsules[selectedDate] || [];
+    return dayCapsules.find((c) => c.category === decodedCategory) || null;
+  }, [dailyCapsules, selectedDate, decodedCategory]);
+
+  if (!isValidSection) {
     return (
       <ThemedView style={styles.errorContainer}>
         <ThemedText type="default">Section not found.</ThemedText>
@@ -49,8 +69,6 @@ export default function SectionDetailScreen() {
       </ThemedView>
     );
   }
-
-  const decodedCategory = decodeURIComponent(category);
 
   return (
     <ThemedView style={styles.container}>
@@ -68,13 +86,11 @@ export default function SectionDetailScreen() {
         </View>
 
         {/* Date Navigation */}
-        {availableDates.length > 0 && (
-          <DateNavigator
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            availableDates={availableDates}
-          />
-        )}
+        <DateNavigator
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          availableDates={availableDates}
+        />
 
         {/* Scrollable list of cards for this date */}
         <ScrollView
@@ -87,21 +103,26 @@ export default function SectionDetailScreen() {
         >
           <View style={styles.introBox}>
             <ThemedText type="code" style={styles.introLabel} themeColor="textSecondary">
-              TODAY'S TOPIC
+              DAILY CONCEPT
             </ThemedText>
             <ThemedText type="small" style={styles.introText} themeColor="textSecondary">
               Tap the card below to read the full engineering capsule detailing this concept.
             </ThemedText>
           </View>
 
-          {activeCapsules.length > 0 ? (
-            activeCapsules.map((capsule) => (
-              <CapsuleCard key={capsule.id} capsule={capsule} />
-            ))
+          {isLoading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ThemedText type="code" style={styles.loaderText} themeColor="textSecondary">
+                LOADING DAILY TOPIC...
+              </ThemedText>
+            </View>
+          ) : activeCapsule ? (
+            <CapsuleCard capsule={activeCapsule} />
           ) : (
             <View style={styles.emptyState}>
               <ThemedText type="small" themeColor="textSecondary">
-                No topic available for this date.
+                No topic available for this edition.
               </ThemedText>
             </View>
           )}
@@ -175,6 +196,16 @@ const styles = StyleSheet.create({
   introText: {
     fontSize: 13,
     lineHeight: 18,
+  },
+  loaderContainer: {
+    paddingVertical: Spacing.six,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
+  },
+  loaderText: {
+    fontSize: 10,
+    letterSpacing: 1,
   },
   emptyState: {
     paddingVertical: Spacing.six,

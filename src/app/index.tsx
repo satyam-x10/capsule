@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react';
-import { Platform, ScrollView, StyleSheet, Pressable, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Platform, Pressable, ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TabBar } from '@/components/TabBar';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { capsules } from '@/data/capsules';
+import { useCapsules } from '@/context/CapsuleContext';
+import { getTodayDateStr } from '@/services/capsuleApi';
 
 interface SectionInfo {
   name: string;
@@ -41,6 +40,10 @@ const SECTIONS: SectionInfo[] = [
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const { dailyCapsules, isLoading } = useCapsules();
+
+  const todayStr = getTodayDateStr();
+  const todayCapsules = dailyCapsules[todayStr] || [];
 
   const handleSectionPress = (sectionName: string) => {
     router.push(`/section/${sectionName}` as any);
@@ -52,62 +55,68 @@ export default function HomeScreen() {
         {/* App Branding Header */}
         <View style={styles.header}>
           <ThemedText type="subtitle" style={styles.brandTitle}>
-            Capsule
+            Hi, Satyam
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
-            Engineered byte-sized capsules. Select a topic to begin reading.
+            Learn these today as of {new Date().toLocaleDateString()}
           </ThemedText>
         </View>
 
-        {/* Scrollable list of sections */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: BottomTabInset + Spacing.six },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {SECTIONS.map((section) => {
-            const count = capsules.filter((c) => c.category === section.name).length;
+        {isLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#FFFFFF" />
+            <ThemedText type="code" style={styles.loadingText} themeColor="textSecondary">
+              FETCHING CAPSULES...
+            </ThemedText>
+          </View>
+        ) : (
+          /* Scrollable list of sections */
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: BottomTabInset + Spacing.four },
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {SECTIONS.map((section) => {
+              const hasCapsuleForToday = todayCapsules.some((c) => c.category === section.name);
 
-            return (
-              <Pressable
-                key={section.name}
-                onPress={() => handleSectionPress(section.name)}
-                style={({ pressed }) => [
-                  styles.cardContainer,
-                  pressed && styles.pressed
-                ]}
-              >
-                <ThemedView type="backgroundElement" style={styles.card}>
-                  <View style={styles.cardContent}>
-                    <ThemedText type="code" style={styles.capsuleCount} themeColor="textSecondary">
-                      {count} CAPSULES
-                    </ThemedText>
+              return (
+                <Pressable
+                  key={section.name}
+                  onPress={() => handleSectionPress(section.name)}
+                  style={({ pressed }) => [
+                    styles.cardContainer,
+                    pressed && styles.pressed
+                  ]}
+                >
+                  <ThemedView type="backgroundElement" style={styles.card}>
+                    <View style={styles.cardContent}>
+                      <ThemedText type="code" style={styles.capsuleCount} themeColor="textSecondary">
+                        {hasCapsuleForToday ? 'DAILY ISSUE' : 'ARCHIVE ONLY'}
+                      </ThemedText>
+                      
+                      <ThemedText type="default" style={styles.sectionTitle} numberOfLines={2}>
+                        {section.name}
+                      </ThemedText>
+
+                      <ThemedText type="small" style={styles.description} themeColor="textSecondary" numberOfLines={3}>
+                        {section.description}
+                      </ThemedText>
+                    </View>
                     
-                    <ThemedText type="default" style={styles.sectionTitle} numberOfLines={2}>
-                      {section.name}
-                    </ThemedText>
-
-                    <ThemedText type="small" style={styles.description} themeColor="textSecondary" numberOfLines={3}>
-                      {section.description}
-                    </ThemedText>
-                  </View>
-                  
-                  <View style={styles.cardFooter}>
-                    <ThemedText type="code" style={styles.actionText}>
-                      Open →
-                    </ThemedText>
-                  </View>
-                </ThemedView>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-
-        {/* Navigation Bar */}
-        <TabBar />
+                    <View style={styles.cardFooter}>
+                      <ThemedText type="code" style={styles.actionText}>
+                        Open →
+                      </ThemedText>
+                    </View>
+                  </ThemedView>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
       </SafeAreaView>
     </ThemedView>
   );
@@ -142,6 +151,16 @@ const styles = StyleSheet.create({
   brandSubtitle: {
     fontSize: 13,
     marginTop: Spacing.half,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.three,
+  },
+  loadingText: {
+    fontSize: 12,
+    letterSpacing: 1,
   },
   scrollView: {
     flex: 1,
