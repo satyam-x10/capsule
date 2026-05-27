@@ -13,27 +13,24 @@ import { useCapsules } from '@/context/CapsuleContext';
 import { getCurrentMonthId } from '@/services/capsuleApi';
 import { generateDatesForMonth } from '@/utils/dateHelper';
 
-const VALID_CATEGORIES = [
-  'AI & ML',
-  'Data Structures & Algorithms',
-  'System Design',
-  'Database Internals',
-  'Web Performance & Networking'
-];
-
 export default function SectionDetailScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category: string }>();
-  const { dailyCapsules, isLoading, fetchDayCapsules } = useCapsules();
+  const { dailyCapsules, sections = [], isLoading, fetchDayCapsules } = useCapsules();
+  const [sectionError, setSectionError] = useState<boolean>(false);
 
   const decodedCategory = useMemo(() => {
     return category ? decodeURIComponent(category) : '';
   }, [category]);
 
   const isValidSection = useMemo(() => {
-    return VALID_CATEGORIES.includes(decodedCategory);
-  }, [decodedCategory]);
+    if (!decodedCategory) return false;
+    // If sections list hasn't loaded yet but the app is in its initial loading state,
+    // assume it might be valid to avoid displaying a premature "not found" error.
+    if (sections.length === 0 && isLoading) return true;
+    return sections.some((s) => s.name === decodedCategory);
+  }, [sections, decodedCategory, isLoading]);
 
   // Generate available days for the current calendar month
   const availableDates = useMemo(() => {
@@ -47,10 +44,20 @@ export default function SectionDetailScreen() {
   });
 
   // Fetch the daily capsule for the selected date on-demand
-  useEffect(() => {
+  const loadContent = async () => {
     if (selectedDate && isValidSection) {
-      fetchDayCapsules(selectedDate);
+      try {
+        setSectionError(false);
+        await fetchDayCapsules(selectedDate);
+      } catch (err) {
+        console.error('[SectionDetailScreen] Failed to load day content:', err);
+        setSectionError(true);
+      }
     }
+  };
+
+  useEffect(() => {
+    loadContent();
   }, [selectedDate, isValidSection]);
 
   // Get the active capsule for this section on the selected date
@@ -110,7 +117,18 @@ export default function SectionDetailScreen() {
             </ThemedText>
           </View>
 
-          {isLoading ? (
+          {sectionError ? (
+            <View style={styles.loaderContainer}>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.errorText}>
+                An error occurred while loading content.
+              </ThemedText>
+              <Pressable onPress={loadContent} style={styles.retryButton}>
+                <ThemedText type="code" style={styles.retryText}>
+                  RETRY
+                </ThemedText>
+              </Pressable>
+            </View>
+          ) : isLoading ? (
             <View style={styles.loaderContainer}>
               <ActivityIndicator size="small" color="#FFFFFF" />
               <ThemedText type="code" style={styles.loaderText} themeColor="textSecondary">
@@ -211,5 +229,25 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.six,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  errorText: {
+    fontSize: 13,
+    color: '#B0B4BA',
+    textAlign: 'center',
+    marginBottom: Spacing.one,
+  },
+  retryButton: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    borderRadius: 4,
+    marginTop: Spacing.one,
+  },
+  retryText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: '#FFFFFF',
   },
 });

@@ -9,38 +9,10 @@ import { useTheme } from '@/hooks/use-theme';
 import { useCapsules } from '@/context/CapsuleContext';
 import { getTodayDateStr } from '@/services/capsuleApi';
 
-interface SectionInfo {
-  name: string;
-  description: string;
-}
-
-const SECTIONS: SectionInfo[] = [
-  {
-    name: 'AI & ML',
-    description: 'Neural network architectures, self-attention mechanics, and model optimizations.',
-  },
-  {
-    name: 'Data Structures & Algorithms',
-    description: 'B-Trees, Bloom filters, cache designs, and space-efficient architectures.',
-  },
-  {
-    name: 'System Design',
-    description: 'Distributed consensus, logical time, conflict resolution, and CQRS setups.',
-  },
-  {
-    name: 'Database Internals',
-    description: 'Storage engines, WAL logs, MVCC models, and crash recovery systems.',
-  },
-  {
-    name: 'Web Performance & Networking',
-    description: 'UDP-based QUIC, TCP BBR congestion modeling, and fast TLS encryption.',
-  },
-];
-
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { dailyCapsules, isLoading } = useCapsules();
+  const { dailyCapsules, sections = [], isLoading, error, refresh } = useCapsules();
 
   const todayStr = getTodayDateStr();
   const todayCapsules = dailyCapsules[todayStr] || [];
@@ -62,7 +34,18 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
 
-        {isLoading ? (
+        {error ? (
+          <View style={styles.errorContainer}>
+            <ThemedText type="default" style={styles.errorText}>
+              An error occurred while loading content.
+            </ThemedText>
+            <Pressable onPress={refresh} style={styles.retryButton}>
+              <ThemedText type="code" style={styles.retryText}>
+                RETRY
+              </ThemedText>
+            </Pressable>
+          </View>
+        ) : isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#FFFFFF" />
             <ThemedText type="code" style={styles.loadingText} themeColor="textSecondary">
@@ -79,7 +62,7 @@ export default function HomeScreen() {
             ]}
             showsVerticalScrollIndicator={false}
           >
-            {SECTIONS.map((section) => {
+            {sections.map((section) => {
               const hasCapsuleForToday = todayCapsules.some((c) => c.category === section.name);
 
               return (
@@ -220,5 +203,31 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#FFFFFF',
     fontWeight: '600',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.three,
+    paddingHorizontal: Spacing.four,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#B0B4BA',
+    textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.two,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    borderRadius: 4,
+    marginTop: Spacing.one,
+  },
+  retryText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: '#FFFFFF',
   },
 });

@@ -15,7 +15,7 @@ class FallbackStorage {
       if (typeof window !== 'undefined' && window.localStorage) {
         return window.localStorage.getItem(key);
       }
-    } catch {}
+    } catch { }
     return this.memoryStore[key] || null;
   }
 
@@ -25,7 +25,7 @@ class FallbackStorage {
         window.localStorage.setItem(key, value);
         return;
       }
-    } catch {}
+    } catch { }
     this.memoryStore[key] = value;
   }
 }
@@ -37,7 +37,7 @@ const safeStorage = {
     try {
       return await AsyncStorage.getItem(key);
     } catch (e: any) {
-      console.warn('[capsuleApi] AsyncStorage.getItem failed, falling back to local memory:', e);
+      console.log('[capsuleApi] AsyncStorage.getItem failed, falling back to local storage/memory');
       return await fallbackStorage.getItem(key);
     }
   },
@@ -45,7 +45,7 @@ const safeStorage = {
     try {
       await AsyncStorage.setItem(key, value);
     } catch (e: any) {
-      console.warn('[capsuleApi] AsyncStorage.setItem failed, falling back to local memory:', e);
+      console.log('[capsuleApi] AsyncStorage.setItem failed, falling back to local storage/memory');
       await fallbackStorage.setItem(key, value);
     }
   }
@@ -94,22 +94,29 @@ export function getDayIdFromDate(dateStr: string): string {
  */
 export async function getDayCapsules(dateStr: string): Promise<Capsule[]> {
   const cacheKey = `${CAPSULES_DAY_CACHE_PREFIX}${dateStr}`;
-  
+
   try {
     // Check if we have cached data for this day
     const cachedData = await safeStorage.getItem(cacheKey);
-    if (cachedData) {
-      return JSON.parse(cachedData);
+    if (cachedData && cachedData !== 'undefined') {
+      try {
+        const parsed = JSON.parse(cachedData);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn('[capsuleApi] Failed to parse cached day capsules:', e);
+      }
     }
-    
+
     // Parse month and day IDs
     const monthId = getMonthIdFromDate(dateStr);
     const dayId = getDayIdFromDate(dateStr);
-    
+
     if (!monthId || !dayId) {
       throw new Error(`Invalid date string: ${dateStr}`);
     }
-    
+
     // Fetch from remote folder: e.g. REMOTE_FOLDER_URL/05-26/27.json
     const targetUrl = `${REMOTE_FOLDER_URL}/${monthId}/${dayId}.json`;
     const response = await fetch(targetUrl, {
@@ -118,15 +125,17 @@ export async function getDayCapsules(dateStr: string): Promise<Capsule[]> {
         'Accept': 'application/json',
       },
     });
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch day ${dateStr} from ${targetUrl}: status ${response.status}`);
     }
-    
+
     const fetchedData = await response.json();
     if (Array.isArray(fetchedData)) {
       // Store to cache permanently (since historical daily data is immutable)
       await safeStorage.setItem(cacheKey, JSON.stringify(fetchedData));
+      console.log({ fetchecapsules: fetchedData });
+
       return fetchedData;
     } else {
       throw new Error('Fetched data is not a valid array');
@@ -136,3 +145,40 @@ export async function getDayCapsules(dateStr: string): Promise<Capsule[]> {
     throw error;
   }
 }
+
+export interface SectionInfo {
+  name: string;
+  description: string;
+}
+
+/**
+ * Fetches sections metadata directly from raw GitHub URL.
+ */
+export async function getSections(): Promise<SectionInfo[]> {
+  try {
+    // Attempt to fetch sections.json from raw git root (replacing /data subfolder)
+    // base URL is: https://raw.githubusercontent.com/satyam-x10/capsule/data/data
+    // So sections.json is at: https://raw.githubusercontent.com/satyam-x10/capsule/data/sections.json
+    const targetUrl = 'https://raw.githubusercontent.com/satyam-x10/capsule/data/sections.json';
+    const response = await fetch(targetUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+
+
+    const fetchedData = await response.json();
+    console.log({ fetchedData });
+    if (Array.isArray(fetchedData)) {
+      return fetchedData;
+    } else {
+      throw new Error('Fetched sections data is not a valid array');
+    }
+  } catch (error) {
+    console.error('[capsuleApi] Failed to retrieve dynamic sections:', error);
+    throw error;
+  }
+}
+

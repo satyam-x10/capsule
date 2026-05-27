@@ -16,24 +16,50 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useCapsules } from '@/context/CapsuleContext';
 import { formatDateString } from '@/utils/dateHelper';
 import { getTodayDateStr } from '@/services/capsuleApi';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function CapsuleDetailScreen() {
   const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
   const router = useRouter();
   const { dailyCapsules, isLoading, fetchDayCapsules } = useCapsules();
+  const [detailError, setDetailError] = useState<boolean>(false);
 
   const activeDate = date || getTodayDateStr();
 
   // Load the daily capsule file if not in memory
-  useEffect(() => {
+  const loadDetail = async () => {
     if (activeDate) {
-      fetchDayCapsules(activeDate);
+      try {
+        setDetailError(false);
+        await fetchDayCapsules(activeDate);
+      } catch (err) {
+        console.error('[CapsuleDetailScreen] Failed to load day capsules:', err);
+        setDetailError(true);
+      }
     }
+  };
+
+  useEffect(() => {
+    loadDetail();
   }, [activeDate]);
 
   const dayCapsules = dailyCapsules[activeDate] || [];
   const capsule = dayCapsules.find((c) => c.id === id);
+
+  if (detailError) {
+    return (
+      <ThemedView style={styles.errorContainer}>
+        <ThemedText type="default" style={styles.errorText}>
+          An error occurred while loading content.
+        </ThemedText>
+        <Pressable onPress={loadDetail} style={styles.retryButton}>
+          <ThemedText type="code" style={styles.retryText}>
+            RETRY
+          </ThemedText>
+        </Pressable>
+      </ThemedView>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -256,5 +282,25 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: '#E0E1E6',
     fontStyle: 'italic',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#B0B4BA',
+    textAlign: 'center',
+    marginBottom: Spacing.one,
+  },
+  retryButton: {
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.two,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    borderRadius: 4,
+    marginTop: Spacing.one,
+  },
+  retryText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: '#FFFFFF',
   },
 });
