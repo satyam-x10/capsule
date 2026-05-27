@@ -1,0 +1,22 @@
+[
+  {
+    "name": "AI & ML",
+    "description": "Neural network architectures, self-attention mechanics, and model optimizations."
+  },
+  {
+    "name": "Data Structures & Algorithms",
+    "description": "B-Trees, Bloom filters, cache designs, and space-efficient architectures."
+  },
+  {
+    "name": "System Design",
+    "description": "Distributed consensus, logical time, conflict resolution, and CQRS setups."
+  },
+  {
+    "name": "Database Internals",
+    "description": "Storage engines, WAL logs, MVCC models, and crash recovery systems."
+  },
+  {
+    "name": "Web Performance & Networking",
+    "description": "UDP-based QUIC, TCP BBR congestion modeling, and fast TLS encryption."
+  }
+]
