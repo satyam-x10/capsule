@@ -134,7 +134,6 @@ export async function getDayCapsules(dateStr: string): Promise<Capsule[]> {
     if (Array.isArray(fetchedData)) {
       // Store to cache permanently (since historical daily data is immutable)
       await safeStorage.setItem(cacheKey, JSON.stringify(fetchedData));
-      console.log({ fetchecapsules: fetchedData });
 
       return fetchedData;
     } else {
@@ -170,7 +169,6 @@ export async function getSections(): Promise<SectionInfo[]> {
 
 
     const fetchedData = await response.json();
-    console.log({ fetchedData });
     if (Array.isArray(fetchedData)) {
       return fetchedData;
     } else {
