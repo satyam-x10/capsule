@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ai-rag-mechanics",
+    "category": "AI & ML",
+    "title": "Retrieval-Augmented Generation (RAG) Architecture",
+    "shortDescription": "How to bypass context window limitations and prevent model hallucinations using vector searches.",
+    "content": "Large Language Models (LLMs) are frozen in time after training and suffer from \"hallucinations\"—generating factually incorrect statements with high confidence. Retrieval-Augmented Generation (RAG) resolves these issues by hooking up the LLM to an external knowledge source.\n\nWhen a user submits a query, it is first converted into a vector representation (embedding) using an embedding model. This embedding is used to perform a similarity search (like cosine distance) against a Vector Database (e.g., Pinecone, pgvector) containing chunked document embeddings.\n\nThe vector database retrieves the top-K most similar text chunks. These chunks are then prepended as \"ground truth context\" directly into the user's prompt template. The LLM reads the context and answers the query based strictly on the retrieved source material, guaranteeing freshness and traceability.",
+    "takeaway": "RAG shifts LLM reliance from parametric memory (built-in knowledge) to non-parametric memory (external search database), eliminating hallucinations and enabling real-time document interaction.",
+    "readTime": "4 min read",
+    "date": "2026-05-26"
+  },
+  {
+    "id": "dsa-bloom-filters",
+    "category": "Data Structures & Algorithms",
+    "title": "Bloom Filters: Probabilistic Bit Arrays",
+    "shortDescription": "How to check if an element exists in a set in O(1) time and zero storage overhead.",
+    "content": "A Bloom filter is a space-efficient, probabilistic data structure used to test set membership. It answers a simple question: \"Is this username taken?\" or \"Is this URL in our malicious URL database?\"\n\nIt consists of a bit array of size M, initialized to 0, and K independent hash functions. To add an element, we hash it K times, obtaining K indices, and set those bits to 1. To query an element, we hash it K times and check if all those bits are 1.\n\nIf any bit is 0, the element is definitely not in the set (zero false negatives). If all bits are 1, the element is *probably* in the set, but there is a chance of a \"false positive\" due to hash collisions. We trade 100% accuracy for O(1) checks and near-zero memory footprint.",
+    "takeaway": "Bloom filters provide space-saving membership tests with zero false negatives. Use them to guard expensive disk reads by quickly checking if a key does NOT exist.",
+    "readTime": "3 min read",
+    "date": "2026-05-26"
+  },
+  {
+    "id": "sys-raft-consensus",
+    "category": "System Design",
+    "title": "Raft Consensus: Leader Election Protocol",
+    "shortDescription": "How distributed nodes elect a single source of truth during partition failures.",
+    "content": "Consistent distributed databases need consensus. Raft simplifies this by separating state agreement into subtasks, starting with Leader Election. A node exists in one of three states: Follower, Candidate, or Leader.\n\nFollowers expect periodic heartbeats from the Leader. If a follower detects a timeout, it transitions to a Candidate, increments the \"term\" counter, votes for itself, and broadcasts RequestVote RPCs.\n\nNodes grant votes only if the candidate's log is at least as up-to-date as their own. If a candidate receives votes from a majority of nodes, it becomes the Leader. If a network partition occurs, the side with the majority elects a leader, while the minority side remains idle, avoiding split-brain writes.",
+    "takeaway": "Raft enforces quorum (majority consensus) to elect leaders. The candidate with the most complete log wins, preventing stale state machines from overriding committed writes.",
+    "readTime": "4 min read",
+    "date": "2026-05-26"
+  },
+  {
+    "id": "db-write-ahead-logging",
+    "category": "Database Internals",
+    "title": "Write-Ahead Logging (WAL) and Crash Recovery",
+    "shortDescription": "How database engines guarantee ACID durability in the face of sudden power failures.",
+    "content": "Flushing updated database blocks (pages) to disk is slow. To prevent latency, database engines update pages in memory (buffer cache) first. However, if power drops, these \"dirty pages\" are lost. Write-Ahead Logging (WAL) resolves this.\n\nBefore modifying database states on disk, the details of the transaction (e.g. \"Set balance of key X to 100\") must be appended to an append-only log file on non-volatile disk. This write is fast because it is sequential and doesn't require random page seeks.\n\nOnce the WAL is flushed, the transaction commits. If the server crashes, the engine scans the WAL during startup, \"replaying\" updates that were committed but not written to the data files, and \"rolling back\" incomplete writes.",
+    "takeaway": "Write-Ahead Logging ensures Durability. Databases commit transactions as soon as the sequential WAL is flushed, postponing expensive page writes for background processing.",
+    "readTime": "3 min read",
+    "date": "2026-05-26"
+  },
+  {
+    "id": "net-http3-quic-multiplexing",
+    "category": "Web Performance & Networking",
+    "title": "HTTP/3: Eliminating Transport Head-of-Line Blocking",
+    "shortDescription": "How moving from TCP to UDP-based QUIC allows streams to fail independently.",
+    "content": "HTTP/2 introduced single-connection multiplexing, allowing multiple files to be fetched concurrently. However, because TCP treats the connection as a single, in-order sequence of bytes, a single packet drop halts delivery of all files until the lost packet is retransmitted.\n\nHTTP/3 solves this by replacing TCP with QUIC, a protocol built on top of UDP. QUIC handles stream isolation at the transport layer.\n\nIf a packet belonging to Stream A is lost, only Stream A is paused. Stream B, C, and D continue streaming to the application. QUIC also integrates TLS 1.3 encryption directly into the handshake, establishing connections in 1 RTT, and supports connection migration.",
+    "takeaway": "HTTP/3 uses UDP-based QUIC to isolate multiplexed streams, ensuring that packet loss on one resource does not stall the download of others.",
+    "readTime": "3 min read",
+    "date": "2026-05-26"
+  }
+]

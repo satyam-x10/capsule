@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ai-quantization",
+    "category": "AI & ML",
+    "title": "Model Quantization: FP16 to INT8 conversion",
+    "shortDescription": "Exploring memory footprint reduction techniques for serving massive neural networks on edge devices.",
+    "content": "Deep learning models are typically trained using FP32 (32-bit single-precision floating-point) weights to maintain gradient fidelity. However, serving a model with billions of parameters in FP32 is computationally expensive and memory-prohibitive. Model Quantization reduces the precision of weights and activations to lower-precision formats like INT8 or FP16.\n\nBy mapping the continuous range of floating-point values to discrete integer buckets (e.g., mapping [-3.2, 4.5] to [-128, 127]), quantization shrinks memory storage by 4x and accelerates inference. Runtimes can utilize high-performance integer ALU hardware instructions (like DP4A or tensor cores) which execute significantly faster than floating-point math.\n\nQuantization can be Post-Training (PTQ), where calibration datasets determine optimal scale factors, or Quantization-Aware Training (QAT), where weight rounding is simulated during training, allowing the model to adapt and recover accuracy losses.",
+    "takeaway": "Quantization trades a tiny fraction of model accuracy for substantial gains in inference speed, reduced memory bandwidth, and the ability to run LLMs on consumer-grade hardware.",
+    "readTime": "3 min read",
+    "date": "2026-05-25"
+  },
+  {
+    "id": "dsa-lru-cache",
+    "category": "Data Structures & Algorithms",
+    "title": "LRU Cache: HashMap and Doubly-Linked List Integration",
+    "shortDescription": "The exact structural components required to achieve O(1) read, write, and evict times.",
+    "content": "A Least Recently Used (LRU) cache discards the least recently accessed items first when it runs out of memory. Designing an LRU cache requires three operations to run in constant time O(1): Lookup, Insertion, and Eviction.\n\nA Hash Map provides O(1) lookup but has no concept of order. A Linked List tracks ordering (nodes are appended to the tail when accessed and removed from the head when evicted), but finding a node is O(N).\n\nBy integrating them—storing a Doubly-Linked List alongside a Hash Map where the map keys point directly to list nodes—we get the best of both. When a key is requested, we pull it from the map in O(1) and shift its node to the tail of the list in O(1). Eviction removes the head node of the list and deletes its key from the map.",
+    "takeaway": "LRU caching leverages a hybrid structure: a Doubly-Linked List coordinates insertion order while a Hash Map maps keys directly to list references, achieving true O(1) complexity.",
+    "readTime": "3 min read",
+    "date": "2026-05-25"
+  },
+  {
+    "id": "sys-cqrs-architecture",
+    "category": "System Design",
+    "title": "CQRS and Event Sourcing: High-Throughput Writes",
+    "shortDescription": "Decoupling read and write databases to bypass table locking and transactional overhead.",
+    "content": "In standard SQL databases, executing complex reports lock tables, slowing down client write transactions. Command Query Responsibility Segregation (CQRS) separates data modifications (Commands) from reads (Queries).\n\nWrites are handled by a write database optimized for insertion integrity. Reads pull from a read database optimized for search queries (like Elasticsearch). Synchronization happens asynchronously.\n\nWhen combined with Event Sourcing, instead of storing the current state, the database stores the sequence of events (e.g. \"Item Added\", \"Item Checked Out\"). The read database plays these events sequentially to construct cached views, yielding extreme write speeds.",
+    "takeaway": "CQRS segregates the database schema. While introducing eventual consistency, it enables independent scaling of read-replicas and write transaction layers.",
+    "readTime": "4 min read",
+    "date": "2026-05-25"
+  },
+  {
+    "id": "db-mvcc-concurrency",
+    "category": "Database Internals",
+    "title": "Multi-Version Concurrency Control (MVCC) Mechanics",
+    "shortDescription": "How modern RDBMS engines allow readers to execute without blocking writers.",
+    "content": "In early databases, to guarantee isolation, a writer transaction would lock rows, blocking all concurrent readers. Multi-Version Concurrency Control (MVCC) solves this by treating rows as versioned histories rather than single values.\n\nWhen a transaction updates a row, the database does not overwrite the existing data. Instead, it creates a new version of the row, linking it to the transaction's transaction ID (txid).\n\nWhen a reader transaction starts, the database determines which transaction IDs were committed at that moment. The reader traverses row versions, reading only the latest version that was committed before its read snapshot started. Writers write to new versions, ensuring readers are never blocked.",
+    "takeaway": "MVCC implements the database maxim: \"Readers do not block writers, and writers do not block readers,\" by keeping historical snapshots of modified rows.",
+    "readTime": "4 min read",
+    "date": "2026-05-25"
+  },
+  {
+    "id": "net-tls-handshake",
+    "category": "Web Performance & Networking",
+    "title": "TLS 1.3 Handshake: Speeding Up Web Encryption",
+    "shortDescription": "How TLS 1.3 reduces cryptographic setup overhead from two round trips to a single RTT.",
+    "content": "Connecting to a secure website over HTTPS requires a TLS handshake to negotiate cryptographic keys. In TLS 1.2, this handshake required two full network round trips (2-RTT) before any application data could be sent, adding noticeable latency.\n\nTLS 1.3 optimizes this by combining key exchange and handshake negotiation. During the first client hello, the client preemptively sends a list of supported cipher suites and key share guesses.\n\nThe server selects the cipher, computes the shared secret, and returns its public key share in the server hello, completing the handshake in exactly one round trip (1-RTT). For repeat visitors, TLS 1.3 supports 0-RTT session resumption, transmitting encrypted data alongside the client hello.",
+    "takeaway": "TLS 1.3 shaves one round trip off connection times by combining key negotiations, accelerating web application load times across cellular connections.",
+    "readTime": "3 min read",
+    "date": "2026-05-25"
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ai-transformer-attention",
+    "category": "AI & ML",
+    "title": "Transformer Attention Mechanics: Query, Key, Value",
+    "shortDescription": "Unveiling the mathematical operations behind the self-attention mechanism in modern Large Language Models.",
+    "content": "At the heart of the Transformer architecture lies the self-attention mechanism, which allows tokens in a sequence to dynamically weigh their relationships with all other tokens. Unlike traditional RNNs that process tokens sequentially, Transformers process entire sequences in parallel, computing context-rich representations.\n\nThis process is formulated using Queries (Q), Keys (K), and Values (V) vectors. For a given token, its Query vector represents \"what I am looking for.\" The Key vectors of other tokens represent \"what I contain,\" and their Value vectors represent \"what information I actually hold.\"\n\nFirst, we compute the similarity between a query and all keys using a dot product: Q * K^T. To prevent the gradients of the softmax function from vanishing at large values, we scale the dot products by dividing by the square root of the dimension of the key vectors (sqrt(d_k)). We then apply the softmax function to obtain attention weights (probabilities) and multiply these weights by the Value vectors (V). The resulting output is a weighted sum of the values, summarizing the context of the sequence for each token: Attention(Q, K, V) = softmax((Q * K^T) / sqrt(d_k)) * V.",
+    "takeaway": "Self-attention maps a query and a set of key-value pairs to an output. Scaling by sqrt(d_k) is mathematically critical to maintain stable gradients during backpropagation.",
+    "readTime": "3 min read",
+    "date": "2026-05-27"
+  },
+  {
+    "id": "dsa-btrees",
+    "category": "Data Structures & Algorithms",
+    "title": "B-Trees: Optimizing Disk Block Accesses",
+    "shortDescription": "Why database index engines prioritize wide, shallow B-Trees over deep binary search trees.",
+    "content": "Standard Binary Search Trees (BSTs) are memory-efficient, but their height scales as O(log2 N). If a database index of 10 million rows were stored in a BST, a search would require up to 24 lookups. On mechanical drives or SSDs, where disk seeks are orders of magnitude slower than CPU cache access, 24 random page reads is a massive bottleneck.\n\nA B-Tree is a self-balancing search tree designed to optimize block-based storage. B-Trees are short and wide. Each node contains multiple sorted keys and child pointers (often hundreds, corresponding to disk page sizes like 4KB).\n\nBecause the branching factor B is large (e.g., B=512), the tree remains incredibly shallow. A 3-level B-Tree can store millions of keys. Searching requires reading only 3 disk blocks, drastically reducing I/O wait times. Leaf nodes in B+ Trees are also linked sequentially, making range queries exceptionally fast.",
+    "takeaway": "B-Trees minimize disk I/O operations by matching node sizes directly with hardware disk pages, keeping the index layout wide, sorted, and shallow.",
+    "readTime": "3 min read",
+    "date": "2026-05-27"
+  },
+  {
+    "id": "sys-vector-clocks",
+    "category": "System Design",
+    "title": "Vector Clocks: Establishing Causal Time",
+    "shortDescription": "Resolving write conflicts in distributed stores without synchronized hardware clocks.",
+    "content": "In distributed databases like DynamoDB or Cassandra, write requests hit different replicas concurrently. Relying on physical computer clocks (NTP) to determine the order of writes leads to data loss, because server clocks drift. Vector Clocks establish causal relationships without physical time.\n\nEach node maintains a vector (an array of counters) of size N (number of nodes). When a node performs a write, it increments its own counter in its vector clock. When passing data, the clock is attached.\n\nWhen node A receives data from node B, it merges vectors by taking the maximum of each element. If vector X has all components greater than or equal to vector Y, X causally succeeded Y (we overwrite Y). If some elements are greater in X and others in Y, a conflict has occurred and must be resolved by the application.",
+    "takeaway": "Vector clocks allow concurrent actors to determine causal ordering. They detect write conflicts, passing execution branches back to developers to resolve.",
+    "readTime": "4 min read",
+    "date": "2026-05-27"
+  },
+  {
+    "id": "db-lsm-vs-btree-internals",
+    "category": "Database Internals",
+    "title": "LSM-Trees vs B-Trees: Read vs Write Tradeoffs",
+    "shortDescription": "Analyzing database layouts: sequential log-structured appends vs random in-place page writes.",
+    "content": "Database engines choose layouts based on hardware profiles. B-Trees use in-place updates. When a row changes, the engine locates the database page containing the row, updates the bytes in memory, and eventually flushes the page back to disk.\n\nThis makes B-Trees ideal for reads, but writes require random disk seeks and write amplification. LSM-Trees (Log-Structured Merge-Trees) use append-only writes. Modifications are written to an in-memory sorted MemTable and a sequential log (WAL).\n\nWhen the MemTable fills, it flushes to disk as an immutable Sorted String Table (SSTable). Background compactions run Merge-Sort to merge SSTables, delete duplicates, and handle removals. Writes are sequential, which maximizes SSD throughput.",
+    "takeaway": "LSM-Trees optimize for write throughput by converting random writes to sequential writes. B-Trees optimize for reads, preventing read amplification.",
+    "readTime": "3 min read",
+    "date": "2026-05-27"
+  },
+  {
+    "id": "net-tcp-bbr-congestion",
+    "category": "Web Performance & Networking",
+    "title": "TCP BBR: Modelling Bandwidth-Delay Product",
+    "shortDescription": "Google's congestion control algorithm that optimizes throughput by bypassing packet drop heuristics.",
+    "content": "Traditional TCP congestion algorithms (Cubic, Reno) use packet loss as a primary signal of congestion. In modern networks with large buffer lines (bufferbloat) or noisy wireless environments, this loss heuristic fails, cutting transmission speeds prematurely or overloading routers.\n\nGoogle's BBR (Bottleneck Bandwidth and RTT) models the physical channel. It tracks the maximum bandwidth of the slowest link and the minimum round-trip propagation time of the path.\n\nBy ensuring the total data in flight equals the Bandwidth-Delay Product (BDP = Max Bandwidth * Min RTT), BBR pumps data at the exact capacity of the network line, maximizing delivery speeds while minimizing queue delay and buffer overflows.",
+    "takeaway": "BBR avoids congestion by keeping transmission rates synchronized with the physical limits of the network pipe, yielding latency benefits on modern paths.",
+    "readTime": "3 min read",
+    "date": "2026-05-27"
+  }
+]
