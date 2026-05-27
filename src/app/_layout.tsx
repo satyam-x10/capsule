@@ -8,6 +8,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="revisions" />
         <Stack.Screen name="capsule/[id]" />
+        <Stack.Screen name="section/[category]" />
       </Stack>
     </ThemeProvider>
   );

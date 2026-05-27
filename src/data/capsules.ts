@@ -1,135 +1,173 @@
 import { Capsule } from '../types/capsule';
 
 export const capsules: Capsule[] = [
-  // -------------------------------------------------------------
-  // DATE: 2026-05-27
-  // -------------------------------------------------------------
+  // =============================================================
+  // SECTION: AI & ML
+  // =============================================================
   {
-    id: 'db-lsm-vs-btree',
+    id: 'ai-transformer-attention',
+    category: 'AI & ML',
+    title: 'Transformer Attention Mechanics: Query, Key, Value',
+    shortDescription: 'Unveiling the mathematical operations behind the self-attention mechanism in modern Large Language Models.',
+    content: 'At the heart of the Transformer architecture lies the self-attention mechanism, which allows tokens in a sequence to dynamically weigh their relationships with all other tokens. Unlike traditional RNNs that process tokens sequentially, Transformers process entire sequences in parallel, computing context-rich representations.\n\nThis process is formulated using Queries (Q), Keys (K), and Values (V) vectors. For a given token, its Query vector represents "what I am looking for." The Key vectors of other tokens represent "what I contain," and their Value vectors represent "what information I actually hold."\n\nFirst, we compute the similarity between a query and all keys using a dot product: Q * K^T. To prevent the gradients of the softmax function from vanishing at large values, we scale the dot products by dividing by the square root of the dimension of the key vectors (sqrt(d_k)). We then apply the softmax function to obtain attention weights (probabilities) and multiply these weights by the Value vectors (V). The resulting output is a weighted sum of the values, summarizing the context of the sequence for each token: Attention(Q, K, V) = softmax((Q * K^T) / sqrt(d_k)) * V.',
+    takeaway: 'Self-attention maps a query and a set of key-value pairs to an output. Scaling by sqrt(d_k) is mathematically critical to maintain stable gradients during backpropagation.',
+    readTime: '3 min read',
+    date: '2026-05-27'
+  },
+  {
+    id: 'ai-rag-mechanics',
+    category: 'AI & ML',
+    title: 'Retrieval-Augmented Generation (RAG) Architecture',
+    shortDescription: 'How to bypass context window limitations and prevent model hallucinations using vector searches.',
+    content: 'Large Language Models (LLMs) are frozen in time after training and suffer from "hallucinations"—generating factually incorrect statements with high confidence. Retrieval-Augmented Generation (RAG) resolves these issues by hooking up the LLM to an external knowledge source.\n\nWhen a user submits a query, it is first converted into a vector representation (embedding) using an embedding model. This embedding is used to perform a similarity search (like cosine distance) against a Vector Database (e.g., Pinecone, pgvector) containing chunked document embeddings.\n\nThe vector database retrieves the top-K most similar text chunks. These chunks are then prepended as "ground truth context" directly into the user\'s prompt template. The LLM reads the context and answers the query based strictly on the retrieved source material, guaranteeing freshness and traceability.',
+    takeaway: 'RAG shifts LLM reliance from parametric memory (built-in knowledge) to non-parametric memory (external search database), eliminating hallucinations and enabling real-time document interaction.',
+    readTime: '4 min read',
+    date: '2026-05-26'
+  },
+  {
+    id: 'ai-quantization',
+    category: 'AI & ML',
+    title: 'Model Quantization: FP16 to INT8 conversion',
+    shortDescription: 'Exploring memory footprint reduction techniques for serving massive neural networks on edge devices.',
+    content: 'Deep learning models are typically trained using FP32 (32-bit single-precision floating-point) weights to maintain gradient fidelity. However, serving a model with billions of parameters in FP32 is computationally expensive and memory-prohibitive. Model Quantization reduces the precision of weights and activations to lower-precision formats like INT8 or FP16.\n\nBy mapping the continuous range of floating-point values to discrete integer buckets (e.g., mapping [-3.2, 4.5] to [-128, 127]), quantization shrinks memory storage by 4x and accelerates inference. Runtimes can utilize high-performance integer ALU hardware instructions (like DP4A or tensor cores) which execute significantly faster than floating-point math.\n\nQuantization can be Post-Training (PTQ), where calibration datasets determine optimal scale factors, or Quantization-Aware Training (QAT), where weight rounding is simulated during training, allowing the model to adapt and recover accuracy losses.',
+    takeaway: 'Quantization trades a tiny fraction of model accuracy for substantial gains in inference speed, reduced memory bandwidth, and the ability to run LLMs on consumer-grade hardware.',
+    readTime: '3 min read',
+    date: '2026-05-25'
+  },
+
+  // =============================================================
+  // SECTION: Data Structures & Algorithms
+  // =============================================================
+  {
+    id: 'dsa-btrees',
+    category: 'Data Structures & Algorithms',
+    title: 'B-Trees: Optimizing Disk Block Accesses',
+    shortDescription: 'Why database index engines prioritize wide, shallow B-Trees over deep binary search trees.',
+    content: 'Standard Binary Search Trees (BSTs) are memory-efficient, but their height scales as O(log2 N). If a database index of 10 million rows were stored in a BST, a search would require up to 24 lookups. On mechanical drives or SSDs, where disk seeks are orders of magnitude slower than CPU cache access, 24 random page reads is a massive bottleneck.\n\nA B-Tree is a self-balancing search tree designed to optimize block-based storage. B-Trees are short and wide. Each node contains multiple sorted keys and child pointers (often hundreds, corresponding to disk page sizes like 4KB).\n\nBecause the branching factor B is large (e.g., B=512), the tree remains incredibly shallow. A 3-level B-Tree can store millions of keys. Searching requires reading only 3 disk blocks, drastically reducing I/O wait times. Leaf nodes in B+ Trees are also linked sequentially, making range queries exceptionally fast.',
+    takeaway: 'B-Trees minimize disk I/O operations by matching node sizes directly with hardware disk pages, keeping the index layout wide, sorted, and shallow.',
+    readTime: '3 min read',
+    date: '2026-05-27'
+  },
+  {
+    id: 'dsa-bloom-filters',
+    category: 'Data Structures & Algorithms',
+    title: 'Bloom Filters: Probabilistic Bit Arrays',
+    shortDescription: 'How to check if an element exists in a set in O(1) time and zero storage overhead.',
+    content: 'A Bloom filter is a space-efficient, probabilistic data structure used to test set membership. It answers a simple question: "Is this username taken?" or "Is this URL in our malicious URL database?"\n\nIt consists of a bit array of size M, initialized to 0, and K independent hash functions. To add an element, we hash it K times, obtaining K indices, and set those bits to 1. To query an element, we hash it K times and check if all those bits are 1.\n\nIf any bit is 0, the element is definitely not in the set (zero false negatives). If all bits are 1, the element is *probably* in the set, but there is a chance of a "false positive" due to hash collisions. We trade 100% accuracy for O(1) checks and near-zero memory footprint.',
+    takeaway: 'Bloom filters provide space-saving membership tests with zero false negatives. Use them to guard expensive disk reads by quickly checking if a key does NOT exist.',
+    readTime: '3 min read',
+    date: '2026-05-26'
+  },
+  {
+    id: 'dsa-lru-cache',
+    category: 'Data Structures & Algorithms',
+    title: 'LRU Cache: HashMap and Doubly-Linked List Integration',
+    shortDescription: 'The exact structural components required to achieve O(1) read, write, and evict times.',
+    content: 'A Least Recently Used (LRU) cache discards the least recently accessed items first when it runs out of memory. Designing an LRU cache requires three operations to run in constant time O(1): Lookup, Insertion, and Eviction.\n\nA Hash Map provides O(1) lookup but has no concept of order. A Linked List tracks ordering (nodes are appended to the tail when accessed and removed from the head when evicted), but finding a node is O(N).\n\nBy integrating them—storing a Doubly-Linked List alongside a Hash Map where the map keys point directly to list nodes—we get the best of both. When a key is requested, we pull it from the map in O(1) and shift its node to the tail of the list in O(1). Eviction removes the head node of the list and deletes its key from the map.',
+    takeaway: 'LRU caching leverages a hybrid structure: a Doubly-Linked List coordinates insertion order while a Hash Map maps keys directly to list references, achieving true O(1) complexity.',
+    readTime: '3 min read',
+    date: '2026-05-25'
+  },
+
+  // =============================================================
+  // SECTION: System Design
+  // =============================================================
+  {
+    id: 'sys-vector-clocks',
+    category: 'System Design',
+    title: 'Vector Clocks: Establishing Causal Time',
+    shortDescription: 'Resolving write conflicts in distributed stores without synchronized hardware clocks.',
+    content: 'In distributed databases like DynamoDB or Cassandra, write requests hit different replicas concurrently. Relying on physical computer clocks (NTP) to determine the order of writes leads to data loss, because server clocks drift. Vector Clocks establish causal relationships without physical time.\n\nEach node maintains a vector (an array of counters) of size N (number of nodes). When a node performs a write, it increments its own counter in its vector clock. When passing data, the clock is attached.\n\nWhen node A receives data from node B, it merges vectors by taking the maximum of each element. If vector X has all components greater than or equal to vector Y, X causally succeeded Y (we overwrite Y). If some elements are greater in X and others in Y, a conflict has occurred and must be resolved by the application.',
+    takeaway: 'Vector clocks allow concurrent actors to determine causal ordering. They detect write conflicts, passing execution branches back to developers to resolve.',
+    readTime: '4 min read',
+    date: '2026-05-27'
+  },
+  {
+    id: 'sys-raft-consensus',
+    category: 'System Design',
+    title: 'Raft Consensus: Leader Election Protocol',
+    shortDescription: 'How distributed nodes elect a single source of truth during partition failures.',
+    content: 'Consistent distributed databases need consensus. Raft simplifies this by separating state agreement into subtasks, starting with Leader Election. A node exists in one of three states: Follower, Candidate, or Leader.\n\nFollowers expect periodic heartbeats from the Leader. If a follower detects a timeout, it transitions to a Candidate, increments the "term" counter, votes for itself, and broadcasts RequestVote RPCs.\n\nNodes grant votes only if the candidate\'s log is at least as up-to-date as their own. If a candidate receives votes from a majority of nodes, it becomes the Leader. If a network partition occurs, the side with the majority elects a leader, while the minority side remains idle, avoiding split-brain writes.',
+    takeaway: 'Raft enforces quorum (majority consensus) to elect leaders. The candidate with the most complete log wins, preventing stale state machines from overriding committed writes.',
+    readTime: '4 min read',
+    date: '2026-05-26'
+  },
+  {
+    id: 'sys-cqrs-architecture',
+    category: 'System Design',
+    title: 'CQRS and Event Sourcing: High-Throughput Writes',
+    shortDescription: 'Decoupling read and write databases to bypass table locking and transactional overhead.',
+    content: 'In standard SQL databases, executing complex reports lock tables, slowing down client write transactions. Command Query Responsibility Segregation (CQRS) separates data modifications (Commands) from reads (Queries).\n\nWrites are handled by a write database optimized for insertion integrity. Reads pull from a read database optimized for search queries (like Elasticsearch). Synchronization happens asynchronously.\n\nWhen combined with Event Sourcing, instead of storing the current state, the database stores the sequence of events (e.g. "Item Added", "Item Checked Out"). The read database plays these events sequentially to construct cached views, yielding extreme write speeds.',
+    takeaway: 'CQRS segregates the database schema. While introducing eventual consistency, it enables independent scaling of read-replicas and write transaction layers.',
+    readTime: '4 min read',
+    date: '2026-05-25'
+  },
+
+  // =============================================================
+  // SECTION: Database Internals
+  // =============================================================
+  {
+    id: 'db-lsm-vs-btree-internals',
     category: 'Database Internals',
-    title: 'LSM-Trees vs B-Trees: The Storage Engine Tradeoff',
-    shortDescription: 'Why modern write-heavy systems choose Log-Structured Merge-trees over traditional B-trees.',
-    content: 'At the heart of database systems lie storage engines, which dictate how data is written to and read from disk. The two dominant layout structures are B-Trees and Log-Structured Merge-Trees (LSM-Trees). B-Trees write data in-place to fixed-size pages (typically 4KB). While this enables highly efficient O(log N) random reads, it incurs heavy write amplification because updating even a single byte requires writing the entire page back to disk.\n\nLSM-Trees trade read latency for write throughput. Instead of writing in-place, writes are appended to an in-memory buffer (MemTable) and a sequential Write-Ahead Log (WAL). When the MemTable fills, it is flushed to disk as a sorted, immutable SSTable (Sorted String Table). Over time, background processes run compaction (Merge Sort) to consolidate keys and reclaim space.\n\nBecause SSTable writes are sequential, LSM-Trees excel at random write throughput, avoiding random disk seeks. However, reads may require checking multiple SSTables (mitigated by Bloom filters), leading to "read amplification".',
-    takeaway: 'Choose B-Trees for read-heavy workloads with strict query latency requirements. Choose LSM-Trees for write-heavy workloads where sequential write bandwidth is the bottleneck.',
+    title: 'LSM-Trees vs B-Trees: Read vs Write Tradeoffs',
+    shortDescription: 'Analyzing database layouts: sequential log-structured appends vs random in-place page writes.',
+    content: 'Database engines choose layouts based on hardware profiles. B-Trees use in-place updates. When a row changes, the engine locates the database page containing the row, updates the bytes in memory, and eventually flushes the page back to disk.\n\nThis makes B-Trees ideal for reads, but writes require random disk seeks and write amplification. LSM-Trees (Log-Structured Merge-Trees) use append-only writes. Modifications are written to an in-memory sorted MemTable and a sequential log (WAL).\n\nWhen the MemTable fills, it flushes to disk as an immutable Sorted String Table (SSTable). Background compactions run Merge-Sort to merge SSTables, delete duplicates, and handle removals. Writes are sequential, which maximizes SSD throughput.',
+    takeaway: 'LSM-Trees optimize for write throughput by converting random writes to sequential writes. B-Trees optimize for reads, preventing read amplification.',
     readTime: '3 min read',
     date: '2026-05-27'
   },
   {
-    id: 'dist-logical-clocks',
-    category: 'Distributed Systems',
-    title: 'Vector Clocks: Ordering Events Without Physical Time',
-    shortDescription: 'How distributed nodes establish causal relationships when physical clocks cannot be trusted.',
-    content: 'In distributed systems, physical clocks drift due to network latency, thermal variance, and hardware imperfections. Thus, relying on physical timestamps to order events (e.g., "did transaction A happen before B?") leads to split-brain scenarios and data loss. Leslie Lamport introduced Logical Clocks to track the causal order of events without absolute physical time.\n\nWhile Lamport clocks assign a single counter to order events, they cannot distinguish between causally dependent events and concurrent ones. Vector Clocks solve this. A vector clock for a system of N nodes is an array of N logical clocks. Each node maintains its own copy of the vector.\n\nWhen a node performs internal work, it increments its own counter in the vector. When it sends a message, it includes its vector clock. Upon receiving a message, the recipient merges the incoming vector with its own by taking the element-wise maximum and increments its own counter. By comparing two vector clocks, a node can determine if one event causally preceded the other, or if they occurred concurrently, allowing application-level conflict resolution.',
-    takeaway: 'Vector clocks allow distributed systems to establish causality and detect concurrent updates (conflicts) without relying on synchronized physical hardware clocks.',
+    id: 'db-write-ahead-logging',
+    category: 'Database Internals',
+    title: 'Write-Ahead Logging (WAL) and Crash Recovery',
+    shortDescription: 'How database engines guarantee ACID durability in the face of sudden power failures.',
+    content: 'Flushing updated database blocks (pages) to disk is slow. To prevent latency, database engines update pages in memory (buffer cache) first. However, if power drops, these "dirty pages" are lost. Write-Ahead Logging (WAL) resolves this.\n\nBefore modifying database states on disk, the details of the transaction (e.g. "Set balance of key X to 100") must be appended to an append-only log file on non-volatile disk. This write is fast because it is sequential and doesn\'t require random page seeks.\n\nOnce the WAL is flushed, the transaction commits. If the server crashes, the engine scans the WAL during startup, "replaying" updates that were committed but not written to the data files, and "rolling back" incomplete writes.',
+    takeaway: 'Write-Ahead Logging ensures Durability. Databases commit transactions as soon as the sequential WAL is flushed, postponing expensive page writes for background processing.',
+    readTime: '3 min read',
+    date: '2026-05-26'
+  },
+  {
+    id: 'db-mvcc-concurrency',
+    category: 'Database Internals',
+    title: 'Multi-Version Concurrency Control (MVCC) Mechanics',
+    shortDescription: 'How modern RDBMS engines allow readers to execute without blocking writers.',
+    content: 'In early databases, to guarantee isolation, a writer transaction would lock rows, blocking all concurrent readers. Multi-Version Concurrency Control (MVCC) solves this by treating rows as versioned histories rather than single values.\n\nWhen a transaction updates a row, the database does not overwrite the existing data. Instead, it creates a new version of the row, linking it to the transaction\'s transaction ID (txid).\n\nWhen a reader transaction starts, the database determines which transaction IDs were committed at that moment. The reader traverses row versions, reading only the latest version that was committed before its read snapshot started. Writers write to new versions, ensuring readers are never blocked.',
+    takeaway: 'MVCC implements the database maxim: "Readers do not block writers, and writers do not block readers," by keeping historical snapshots of modified rows.',
     readTime: '4 min read',
-    date: '2026-05-27'
-  },
-  {
-    id: 'net-tcp-bbr',
-    category: 'Computer Networks',
-    title: 'TCP BBR: Congestion Control Redefined',
-    shortDescription: 'How Googles Bottleneck Bandwidth and RTT algorithm outperforms packet-loss-based congestion engines.',
-    content: 'Traditional TCP congestion control algorithms like Reno and Cubic rely on packet loss as a signal of network congestion. They operate on a simple heuristic: increase transmission speed until a packet is dropped, then drastically cut the sending rate. In modern networks, this leads to "bufferbloat"—where routers cache packets in large buffers, increasing round-trip time (RTT) without dropping packets until the buffers overflow.\n\nGoogle developed BBR (Bottleneck Bandwidth and RTT) to solve this. Instead of waiting for packet loss, BBR models the physical network path. It continuously measures two metrics: the maximum bandwidth of the bottleneck link and the minimum round-trip time of the path.\n\nBy keeping the amount of data in flight equal to the product of bandwidth and RTT (the Bandwidth-Delay Product, or BDP), BBR achieves maximum throughput with minimal queue delay. It operates at the optimal point of the network path, preventing packet loss and bufferbloat altogether, which makes it particularly resilient against random, non-congestive packet loss on wireless networks.',
-    takeaway: 'BBR changes congestion control from reactive loss recovery to active modeling of the network pipe, yielding higher throughput and lower latency over lossy, high-latency connections.',
-    readTime: '3 min read',
-    date: '2026-05-27'
-  },
-  {
-    id: 'web-http3-quic',
-    category: 'Web Performance',
-    title: 'HTTP/3 and the Death of Head-of-Line Blocking',
-    shortDescription: 'How shifting from TCP to UDP-based QUIC fixes the performance bottlenecks of HTTP/2 multiplexing.',
-    content: 'HTTP/2 introduced stream multiplexing, allowing a client to request multiple resources (HTML, CSS, JS) over a single TCP connection. This solved the problem of browser connection limits. However, it introduced a new issue: TCP-level Head-of-Line (HOL) blocking. Since TCP guarantees in-order delivery, if a single packet belonging to one resource is lost, the operating system pauses delivery of all other streams until the lost packet is retransmitted.\n\nHTTP/3 solves this by replacing TCP with QUIC, a transport layer protocol built on top of UDP. QUIC moves stream multiplexing from the application layer down to the transport layer. In QUIC, each stream is independent.\n\nIf a packet belonging to Stream A is lost, only Stream A is blocked. Stream B and Stream C continue delivering data to the application layer uninterrupted. In addition, QUIC integrates TLS 1.3 encryption directly into the handshake, reducing connection establishment from 2-3 round trips to just 1 (or even 0 on reconnects), and supports seamless connection migration when switching from Wi-Fi to cellular data.',
-    takeaway: 'By using UDP-based QUIC, HTTP/3 eliminates TCP head-of-line blocking, accelerates TLS handshakes, and provides robust connection migration for mobile users.',
-    readTime: '3 min read',
-    date: '2026-05-27'
+    date: '2026-05-25'
   },
 
-  // -------------------------------------------------------------
-  // DATE: 2026-05-26
-  // -------------------------------------------------------------
+  // =============================================================
+  // SECTION: Web Performance & Networking
+  // =============================================================
   {
-    id: 'arch-cqrs',
-    category: 'Architecture',
-    title: 'CQRS: Decoupling Read and Write Models',
-    shortDescription: 'Command Query Responsibility Segregation and when to apply it for high-scale systems.',
-    content: 'In traditional CRUD architectures, the same database model is used to create, update, and read data. While simple, this creates conflict as applications scale. A write model requires normalization to ensure transactional integrity (consistency, constraints), while a read model requires denormalization (joins, aggregations) to maximize query performance.\n\nCQRS (Command Query Responsibility Segregation) separates these concerns into two distinct pathways: Commands (writes) and Queries (reads). Commands perform state mutations and return no data (other than success/failure). Queries retrieve data and perform no state modifications.\n\nThis separation allows you to optimize each database representation independently. For instance, writes can target a highly normalized PostgreSQL schema, while reads pull from a read-replica, an Elasticsearch cluster, or pre-computed Redis caches. State synchronization is typically handled asynchronously via an event bus (eventual consistency).',
-    takeaway: 'CQRS decouples the operational model from the presentation model. Use it when read and write workloads have drastically different scaling characteristics or complex validation logic.',
-    readTime: '4 min read',
-    date: '2026-05-26'
+    id: 'net-tcp-bbr-congestion',
+    category: 'Web Performance & Networking',
+    title: 'TCP BBR: Modelling Bandwidth-Delay Product',
+    shortDescription: 'Google\'s congestion control algorithm that optimizes throughput by bypassing packet drop heuristics.',
+    content: 'Traditional TCP congestion algorithms (Cubic, Reno) use packet loss as a primary signal of congestion. In modern networks with large buffer lines (bufferbloat) or noisy wireless environments, this loss heuristic fails, cutting transmission speeds prematurely or overloading routers.\n\nGoogle\'s BBR (Bottleneck Bandwidth and RTT) models the physical channel. It tracks the maximum bandwidth of the slowest link and the minimum round-trip propagation time of the path.\n\nBy ensuring the total data in flight equals the Bandwidth-Delay Product (BDP = Max Bandwidth * Min RTT), BBR pumps data at the exact capacity of the network line, maximizing delivery speeds while minimizing queue delay and buffer overflows.',
+    takeaway: 'BBR avoids congestion by keeping transmission rates synchronized with the physical limits of the network pipe, yielding latency benefits on modern paths.',
+    readTime: '3 min read',
+    date: '2026-05-27'
   },
   {
-    id: 'os-ebpf',
-    category: 'OS Internals',
-    title: 'eBPF: Sandboxed Programmability in the Kernel',
-    shortDescription: 'How Extended Berkeley Packet Filter allows running custom code inside the Linux kernel safely.',
-    content: 'Historically, modifying the behavior of the Linux kernel required writing kernel modules or upstreaming code to the kernel itself. Writing kernel modules is notoriously risky—a single memory error or null pointer dereference will crash the entire operating system (Kernel Panic).\n\neBPF (Extended Berkeley Packet Filter) changes this by offering a virtual machine inside the Linux kernel. It allows developers to run sandboxed code at hook points within the kernel space—such as network events, system calls, function entries, and tracepoints—without reloading the kernel or modifying source code.\n\nTo guarantee safety, eBPF programs pass through a strict kernel verifier. The verifier checks that the code cannot crash, contains no infinite loops, registers bounds check all memory accesses, and respects kernel boundaries. Once verified, the bytecode is JIT-compiled into native machine instructions for bare-metal performance. eBPF has revolutionized networking, system observability, and security tooling.',
-    takeaway: 'eBPF makes the kernel programmable. It provides a safe, high-performance way to instrument, monitor, and secure applications directly from the OS kernel.',
-    readTime: '4 min read',
-    date: '2026-05-26'
-  },
-  {
-    id: 'sec-zkp',
-    category: 'Security & Crypto',
-    title: 'Zero-Knowledge Proofs: Trust Without Sharing',
-    shortDescription: 'The core mechanics of cryptographic proofs that verify knowledge without revealing the secret.',
-    content: 'Zero-Knowledge Proofs (ZKPs) are cryptographic protocols that enable one party (the Prover) to convince another party (the Verifier) that a specific statement is true, without revealing any information beyond the statement itself. A classic analogy is proving you know the combination to a safe by opening it and retrieving an object, without showing the verifier the actual numbers.\n\nModern ZKPs, such as zk-SNARKs (Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge), rely on advanced mathematical concepts like elliptic curve pairings and polynomial commitments. The proof generated is "succinct," meaning it is tiny in size and can be verified in milliseconds, even if the underlying statement computation was massive.\n\nIn practice, ZKPs enable privacy-preserving applications: verifying a user is over 18 without revealing their birthdate, proving ownership of assets without displaying bank balances, and rolling up thousands of blockchain transactions into a single, easily verifiable cryptographic proof to achieve scaling.',
-    takeaway: 'ZKPs enable a fundamental shift in security: validating claims mathematically without sharing the sensitive data that supports those claims.',
+    id: 'net-http3-quic-multiplexing',
+    category: 'Web Performance & Networking',
+    title: 'HTTP/3: Eliminating Transport Head-of-Line Blocking',
+    shortDescription: 'How moving from TCP to UDP-based QUIC allows streams to fail independently.',
+    content: 'HTTP/2 introduced single-connection multiplexing, allowing multiple files to be fetched concurrently. However, because TCP treats the connection as a single, in-order sequence of bytes, a single packet drop halts delivery of all files until the lost packet is retransmitted.\n\nHTTP/3 solves this by replacing TCP with QUIC, a protocol built on top of UDP. QUIC handles stream isolation at the transport layer.\n\nIf a packet belonging to Stream A is lost, only Stream A is paused. Stream B, C, and D continue streaming to the application. QUIC also integrates TLS 1.3 encryption directly into the handshake, establishing connections in 1 RTT, and supports connection migration.',
+    takeaway: 'HTTP/3 uses UDP-based QUIC to isolate multiplexed streams, ensuring that packet loss on one resource does not stall the download of others.',
     readTime: '3 min read',
     date: '2026-05-26'
   },
   {
-    id: 'dist-raft',
-    category: 'Distributed Databases',
-    title: 'Raft Consensus Protocol: Simplicity in Agreement',
-    shortDescription: 'An intuitive breakdown of Raft, the modern alternative to Paxos for distributed log replication.',
-    content: 'For a distributed database to remain consistent and highly available, nodes must agree on a shared sequence of operations (a log). This agreement is called consensus. For decades, Paxos was the gold standard for consensus, but its implementation details were notoriously difficult to comprehend and code correctly. Raft was designed in 2014 specifically to be understandable.\n\nRaft decomposes consensus into three subproblems: Leader Election, Log Replication, and Safety. A Raft cluster always has one active Leader, while the other nodes are Followers. The leader handles all client write requests, appends them to its log, and replicates them to the followers.\n\nIf the leader fails, followers detect the lack of heartbeats and start a new election, electing a candidate that has the most up-to-date log. Once a write is replicated to a majority of nodes, it is "committed" and safe to apply to the database state machine. Raft guarantees that committed logs are never overwritten, ensuring strict serializability across failures.',
-    takeaway: 'Raft achieves consensus by designating a single leader to manage replication, creating a structured, understandable process for building consistent distributed state machines.',
-    readTime: '4 min read',
-    date: '2026-05-26'
-  },
-
-  // -------------------------------------------------------------
-  // DATE: 2026-05-25
-  // -------------------------------------------------------------
-  {
-    id: 'comp-jit',
-    category: 'Compilers',
-    title: 'JIT Compilation: Balancing Speed and Warmup',
-    shortDescription: 'How modern runtimes combine interpretation and dynamic compilation for optimal execution.',
-    content: 'Programming languages generally fall into two compilation strategies: Ahead-Of-Time (AOT) compiled to machine code (Go, Rust, C++) or Interpreted step-by-step (Python, Ruby). AOT languages start instantly and run at maximum speed, but lack runtime context. Interpreted languages start instantly but run slowly. Just-In-Time (JIT) compilation bridges this gap.\n\nA JIT compiler (used in JavaScript V8, Java JVM, PyPy) starts execution by interpreting the code. While running, it profiles the code to identify "hot spots"—functions or loops executed frequently. It then compiles these hot spots directly into native machine code on the fly.\n\nBecause compilation happens at runtime, the JIT can perform optimizations that AOT compilers cannot. It uses runtime information (such as actual types passed to a generic function) to speculative-inline code and remove dynamic checks. If runtime assumptions change (deoptimization), the VM seamlessly falls back to the interpreter.',
-    takeaway: 'JIT compilers combine the quick startup of interpretation with the high execution speeds of native code, optimizing compilation on the fly based on live runtime behavior.',
+    id: 'net-tls-handshake',
+    category: 'Web Performance & Networking',
+    title: 'TLS 1.3 Handshake: Speeding Up Web Encryption',
+    shortDescription: 'How TLS 1.3 reduces cryptographic setup overhead from two round trips to a single RTT.',
+    content: 'Connecting to a secure website over HTTPS requires a TLS handshake to negotiate cryptographic keys. In TLS 1.2, this handshake required two full network round trips (2-RTT) before any application data could be sent, adding noticeable latency.\n\nTLS 1.3 optimizes this by combining key exchange and handshake negotiation. During the first client hello, the client preemptively sends a list of supported cipher suites and key share guesses.\n\nThe server selects the cipher, computes the shared secret, and returns its public key share in the server hello, completing the handshake in exactly one round trip (1-RTT). For repeat visitors, TLS 1.3 supports 0-RTT session resumption, transmitting encrypted data alongside the client hello.',
+    takeaway: 'TLS 1.3 shaves one round trip off connection times by combining key negotiations, accelerating web application load times across cellular connections.',
     readTime: '3 min read',
-    date: '2026-05-25'
-  },
-  {
-    id: 'crypto-ecc',
-    category: 'Cryptography',
-    title: 'Elliptic Curve Cryptography: Power in Curves',
-    shortDescription: 'Why smaller ECC keys provide stronger security than traditional RSA cryptosystems.',
-    content: 'Public-key cryptography relies on mathematical operations that are easy to perform in one direction but extremely difficult to reverse. RSA relies on the difficulty of factoring the product of two massive prime numbers. However, as computer speeds increase, RSA keys must become impractically large (e.g., 4096 bits) to remain secure, leading to slow handshakes and heavy CPU usage.\n\nElliptic Curve Cryptography (ECC) replaces prime factorization with the algebraic structure of elliptic curves over finite fields. The security of ECC rests on the "elliptic curve discrete logarithm problem"—finding how many times a base point was added to itself to get a resulting public point is computationally impossible.\n\nAn ECC key of just 256 bits offers equivalent security to a 3072-bit RSA key. This reduction in size translates to faster cryptographic signatures, reduced data packet sizes, faster SSL/TLS handshakes, and less power consumption on mobile and IoT devices.',
-    takeaway: 'ECC achieves state-of-the-art cryptographic strength using a fraction of the key size required by RSA, improving performance and battery life across the web.',
-    readTime: '3 min read',
-    date: '2026-05-25'
-  },
-  {
-    id: 'cache-eviction',
-    category: 'Caching',
-    title: 'Cache Eviction: LRU vs LFU Tradeoffs',
-    shortDescription: 'Analyzing recency-based and frequency-based eviction strategies in hardware and software.',
-    content: 'Caches are bounded memories. When a cache fills, the system must decide which item to discard to make room for new data. This is the cache eviction problem. The two primary strategies are Least Recently Used (LRU) and Least Frequently Used (LFU).\n\nLRU discards the item that has not been accessed for the longest duration. It assumes that if you accessed data recently, you will likely access it again soon (temporal locality). LRU is simple to implement using a hash map combined with a doubly linked list, achieving O(1) reads, writes, and evictions.\n\nLFU discards the item with the lowest access count. LFU is ideal for items with long-term popularity, but it struggles when access patterns shift—items that were popular in the past retain high frequency counts, blocking newer, more relevant items from caching. LFU also requires tracking hit counts, which increases memory overhead. Modern caches often combine both strategies (e.g., W-TinyLFU in Caffeine cache).',
-    takeaway: 'Choose LRU for workloads where temporal recency dominates. Choose LFU when items have a stable, long-term frequency distributions, but be aware of memory overhead and stale entries.',
-    readTime: '3 min read',
-    date: '2026-05-25'
-  },
-  {
-    id: 'concur-actors-csp',
-    category: 'Concurrency',
-    title: 'Actors vs CSP: Two Paths to Shared-Nothing Concurrency',
-    shortDescription: 'Comparing the mailbox model of Erlang with the channel model of Go.',
-    content: 'Writing concurrent applications with shared memory and locks (mutexes) is notorious for producing race conditions, deadlocks, and hard-to-reproduce bugs. To combat this, modern runtimes use a "shared-nothing" approach where concurrent processes communicate by passing messages. The two primary models are the Actor Model and Communicating Sequential Processes (CSP).\n\nIn the Actor Model (used in Erlang/Elixir, Akka), the core primitive is an "Actor". Actors encapsulate state and behavior, and communicate by sending messages directly to each other\'s "mailboxes". The sender must know the identity (address) of the recipient. Actors run asynchronously and operate independently.\n\nIn the CSP Model (used in Go, Clojure), the core primitives are sequential processes and "Channels". Instead of addressing processes directly, processes write to and read from named channels. Channels act as decoupling conduits. They can be unbuffered (blocking synchronization) or buffered (asynchronous). In CSP, the processes are anonymous to each other; they only care about the channel they read from or write to.',
-    takeaway: 'Use the Actor Model for fault-tolerant, distributed systems where location transparency is key. Use CSP (channels) for local coordination of lightweight concurrent processes within a single application.',
-    readTime: '4 min read',
     date: '2026-05-25'
   }
 ];

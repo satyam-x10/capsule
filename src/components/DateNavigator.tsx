@@ -1,8 +1,7 @@
-import React from 'react';
+import { Spacing } from '@/constants/theme';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
-import { Spacing } from '@/constants/theme';
 
 interface DateNavigatorProps {
   selectedDate: string;
@@ -12,7 +11,7 @@ interface DateNavigatorProps {
 
 export function DateNavigator({ selectedDate, onDateChange, availableDates }: DateNavigatorProps) {
   const currentIndex = availableDates.indexOf(selectedDate);
-  
+
   const hasPrev = currentIndex > 0;
   const hasNext = currentIndex < availableDates.length - 1;
 
@@ -59,9 +58,7 @@ export function DateNavigator({ selectedDate, onDateChange, availableDates }: Da
       </Pressable>
 
       <View style={styles.dateLabelContainer}>
-        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.subtext}>
-          ENGINEERING CAPSULES FOR
-        </ThemedText>
+
         <ThemedText type="default" style={styles.dateText}>
           {formatDate(selectedDate)}
         </ThemedText>
