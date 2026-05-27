@@ -1,15 +1,15 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Platform, ScrollView, StyleSheet, Pressable, View, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DateNavigator } from '@/components/DateNavigator';
 import { CapsuleCard } from '@/components/CapsuleCard';
+import { DateNavigator } from '@/components/DateNavigator';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 import { useCapsules } from '@/context/CapsuleContext';
+import { useTheme } from '@/hooks/use-theme';
 import { getCurrentMonthId } from '@/services/capsuleApi';
 import { generateDatesForMonth } from '@/utils/dateHelper';
 
@@ -108,14 +108,7 @@ export default function SectionDetailScreen() {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.introBox}>
-            <ThemedText type="code" style={styles.introLabel} themeColor="textSecondary">
-              DAILY CONCEPT
-            </ThemedText>
-            <ThemedText type="small" style={styles.introText} themeColor="textSecondary">
-              Tap the card below to read the full engineering capsule detailing this concept.
-            </ThemedText>
-          </View>
+
 
           {sectionError ? (
             <View style={styles.loaderContainer}>

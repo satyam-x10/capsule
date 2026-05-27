@@ -1,10 +1,9 @@
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Spacing } from '@/constants/theme';
 import { useRouter } from 'expo-router';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Capsule } from '../types/capsule';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
-import { Spacing } from '@/constants/theme';
-import { Capsule } from '../types/capsule';
 
 interface CapsuleCardProps {
   capsule: Capsule;
@@ -45,7 +44,7 @@ export function CapsuleCard({ capsule }: CapsuleCardProps) {
 
         <View style={styles.footer}>
           <ThemedText type="code" style={styles.readLink}>
-            Read Capsule →
+            →
           </ThemedText>
         </View>
       </ThemedView>
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: Spacing.two,
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
   },
   readLink: {
     fontSize: 12,

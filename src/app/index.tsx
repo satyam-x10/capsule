@@ -1,21 +1,17 @@
 import { useRouter } from 'expo-router';
-import { Platform, Pressable, ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
 import { useCapsules } from '@/context/CapsuleContext';
-import { getTodayDateStr } from '@/services/capsuleApi';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function HomeScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { dailyCapsules, sections = [], isLoading, error, refresh } = useCapsules();
-
-  const todayStr = getTodayDateStr();
-  const todayCapsules = dailyCapsules[todayStr] || [];
+  const { sections = [], isLoading, error, refresh } = useCapsules();
 
   const handleSectionPress = (sectionName: string) => {
     router.push(`/section/${sectionName}` as any);
@@ -63,8 +59,6 @@ export default function HomeScreen() {
             showsVerticalScrollIndicator={false}
           >
             {sections.map((section) => {
-              const hasCapsuleForToday = todayCapsules.some((c) => c.category === section.name);
-
               return (
                 <Pressable
                   key={section.name}
@@ -76,10 +70,8 @@ export default function HomeScreen() {
                 >
                   <ThemedView type="backgroundElement" style={styles.card}>
                     <View style={styles.cardContent}>
-                      <ThemedText type="code" style={styles.capsuleCount} themeColor="textSecondary">
-                        {hasCapsuleForToday ? 'DAILY ISSUE' : 'ARCHIVE ONLY'}
-                      </ThemedText>
-                      
+
+
                       <ThemedText type="default" style={styles.sectionTitle} numberOfLines={2}>
                         {section.name}
                       </ThemedText>
@@ -88,12 +80,7 @@ export default function HomeScreen() {
                         {section.description}
                       </ThemedText>
                     </View>
-                    
-                    <View style={styles.cardFooter}>
-                      <ThemedText type="code" style={styles.actionText}>
-                        Open →
-                      </ThemedText>
-                    </View>
+
                   </ThemedView>
                 </Pressable>
               );
