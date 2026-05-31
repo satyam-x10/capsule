@@ -13,8 +13,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const { sections = [], isLoading, error, refresh } = useCapsules();
 
-  const handleSectionPress = (sectionName: string) => {
-    router.push(`/section/${sectionName}` as any);
+  const handleSectionPress = (sectionId: number) => {
+    router.push(`/section/${sectionId}` as any);
   };
 
   return (
@@ -61,8 +61,8 @@ export default function HomeScreen() {
             {sections.map((section) => {
               return (
                 <Pressable
-                  key={section.name}
-                  onPress={() => handleSectionPress(section.name)}
+                  key={section.id}
+                  onPress={() => handleSectionPress(section.id)}
                   style={({ pressed }) => [
                     styles.cardContainer,
                     pressed && styles.pressed

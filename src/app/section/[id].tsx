@@ -16,21 +16,26 @@ import { generateDatesForMonth } from '@/utils/dateHelper';
 export default function SectionDetailScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { category } = useLocalSearchParams<{ category: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { dailyCapsules, sections = [], isLoading, fetchDayCapsules } = useCapsules();
   const [sectionError, setSectionError] = useState<boolean>(false);
 
-  const decodedCategory = useMemo(() => {
-    return category ? decodeURIComponent(category) : '';
-  }, [category]);
+  const sectionId = useMemo(() => {
+    return id ? parseInt(id, 10) : NaN;
+  }, [id]);
+
+  const activeSection = useMemo(() => {
+    if (isNaN(sectionId)) return null;
+    return sections.find((s) => s.id === sectionId) || null;
+  }, [sections, sectionId]);
 
   const isValidSection = useMemo(() => {
-    if (!decodedCategory) return false;
+    if (isNaN(sectionId)) return false;
     // If sections list hasn't loaded yet but the app is in its initial loading state,
     // assume it might be valid to avoid displaying a premature "not found" error.
     if (sections.length === 0 && isLoading) return true;
-    return sections.some((s) => s.name === decodedCategory);
-  }, [sections, decodedCategory, isLoading]);
+    return !!activeSection;
+  }, [sections, activeSection, isLoading]);
 
   // Generate available days for the current calendar month
   const availableDates = useMemo(() => {
@@ -63,8 +68,8 @@ export default function SectionDetailScreen() {
   // Get the active capsule for this section on the selected date
   const activeCapsule = useMemo(() => {
     const dayCapsules = dailyCapsules[selectedDate] || [];
-    return dayCapsules.find((c) => c.category === decodedCategory) || null;
-  }, [dailyCapsules, selectedDate, decodedCategory]);
+    return dayCapsules.find((c) => c.sectionId === sectionId) || null;
+  }, [dailyCapsules, selectedDate, sectionId]);
 
   if (!isValidSection) {
     return (
@@ -88,7 +93,7 @@ export default function SectionDetailScreen() {
             </ThemedText>
           </Pressable>
           <ThemedText type="code" style={styles.headerCategory} themeColor="textSecondary">
-            {decodedCategory.toUpperCase()}
+            {activeSection ? activeSection.name.toUpperCase() : ''}
           </ThemedText>
         </View>
 

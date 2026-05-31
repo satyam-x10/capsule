@@ -146,6 +146,7 @@ export async function getDayCapsules(dateStr: string): Promise<Capsule[]> {
 }
 
 export interface SectionInfo {
+  id: number;
   name: string;
   description: string;
 }

@@ -1,5 +1,6 @@
 export interface Capsule {
   id: string;
+  sectionId: number;
   category: string;
   title: string;
   shortDescription: string;
@@ -12,6 +13,7 @@ export interface Capsule {
 export interface Revision {
   capsuleId: string;
   capsuleTitle: string;
+  sectionId: number;
   category: string;
   note: string;
   savedDate: string; // Formatting like "May 27, 2026" or YYYY-MM-DD

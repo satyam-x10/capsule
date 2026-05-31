@@ -9,7 +9,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="capsule/[id]" />
-          <Stack.Screen name="section/[category]" />
+          <Stack.Screen name="section/[id]" />
         </Stack>
       </CapsuleProvider>
     </ThemeProvider>
