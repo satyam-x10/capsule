@@ -1,0 +1,11 @@
+[{
+  "id": "ai-rag-mechanics",
+  "sectionId": 1,
+  "category": "AI & Emerging Technology",
+  "title": "Retrieval-Augmented Generation (RAG) Architecture",
+  "shortDescription": "How to bypass context window limitations and prevent model hallucinations using vector searches.",
+  "content": "Large Language Models (LLMs) are frozen in time after training and suffer from \"hallucinations\"—generating factually incorrect statements with high confidence. Retrieval-Augmented Generation (RAG) resolves these issues by hooking up the LLM to an external knowledge source.\n\nWhen a user submits a query, it is first converted into a vector representation (embedding) using an embedding model. This embedding is used to perform a similarity search (like cosine distance) against a Vector Database (e.g., Pinecone, pgvector) containing chunked document embeddings.\n\nThe vector database retrieves the top-K most similar text chunks. These chunks are then prepended as \"ground truth context\" directly into the user's prompt template. The LLM reads the context and answers the query based strictly on the retrieved source material, guaranteeing freshness and traceability.",
+  "takeaway": "RAG shifts LLM reliance from parametric memory (built-in knowledge) to non-parametric memory (external search database), eliminating hallucinations and enabling real-time document interaction.",
+  "readTime": "4 min read",
+  "date": "2026-05-26"
+}]
