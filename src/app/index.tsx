@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CalendarView } from '@/components/CalendarView';
@@ -14,6 +14,15 @@ import { useTheme } from '@/hooks/use-theme';
 import { getConvo } from '@/services/capsuleApi';
 import { ConvoData } from '@/types/capsule';
 import { formatDateString } from '@/utils/dateHelper';
+
+const getDateSeed = (dateStr: string): number => {
+  if (!dateStr) return 0;
+  let hash = 0;
+  for (let i = 0; i < dateStr.length; i++) {
+    hash = dateStr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % 10000;
+};
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<'home' | 'topics' | 'communication'>('home');
@@ -121,14 +130,26 @@ export default function HomeScreen() {
         {activeTab === 'home' ? (
           <View style={styles.homeTabContainer}>
             <DateNavigator selectedDate={selectedDate} onDateChange={setSelectedDate} />
-            <View style={styles.welcomeContainer}>
-              <ThemedText type="subtitle" style={styles.welcomeTitle}>
-                Welcome to Capsule
-              </ThemedText>
-              <ThemedText type="default" themeColor="textSecondary" style={styles.welcomeText}>
-                Use the date navigator above to select a date. Then navigate to "Topics" to view daily learning cards, or "Communication" to practice speaking and learning new vocabulary for the selected date!
-              </ThemedText>
-            </View>
+            <ScrollView
+              style={styles.homeScroll}
+              contentContainerStyle={styles.homeScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.imageCard}>
+                <View style={styles.imageHeader}>
+                  <ThemedText type="smallBold" style={styles.imageTag}>
+                    🖼️ DAILY VIEW
+                  </ThemedText>
+                </View>
+                <View style={styles.imageWrapper}>
+                  <Image
+                    source={{ uri: `https://picsum.photos/600/400?random=${getDateSeed(selectedDate)}` }}
+                    style={styles.randomImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+            </ScrollView>
           </View>
         ) : activeTab === 'communication' ? (
           isConvoLoading ? (
@@ -448,11 +469,20 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 320,
     justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.4)',
+      },
+    }),
     zIndex: 100,
   },
   tabButton: {
@@ -508,5 +538,75 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 14,
     lineHeight: 22,
+  },
+  homeScroll: {
+    flex: 1,
+    width: '100%',
+  },
+  homeScrollContent: {
+    paddingBottom: BottomTabInset + Spacing.six + 40,
+  },
+  imageCard: {
+    padding: Spacing.four,
+    backgroundColor: '#0F1011',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    borderRadius: 16,
+    marginHorizontal: Spacing.four,
+    marginTop: Spacing.four,
+    gap: Spacing.two,
+  },
+  imageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.half,
+  },
+  imageTag: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+  },
+  refreshImageButton: {
+    paddingHorizontal: Spacing.two + 2,
+    paddingVertical: 5,
+    borderRadius: 12,
+    backgroundColor: '#1C1D1F',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+  },
+  refreshImageText: {
+    color: '#B0B4BA',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  imageWrapper: {
+    width: '100%',
+    aspectRatio: 1.5,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#121314',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+  },
+  randomImage: {
+    width: '100%',
+    height: '100%',
+  },
+  imageLoader: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
 });
