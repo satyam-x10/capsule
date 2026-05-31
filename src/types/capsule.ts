@@ -18,3 +18,21 @@ export interface Revision {
   note: string;
   savedDate: string; // Formatting like "May 27, 2026" or YYYY-MM-DD
 }
+
+export interface ConvoUtterance {
+  speaker: string;
+  text: string;
+}
+
+export interface VocabularyWord {
+  word: string;
+  meaning: string;
+}
+
+export interface ConvoData {
+  title: string;
+  theme: string;
+  conversation: ConvoUtterance[];
+  vocabulary: VocabularyWord[];
+  takeaway: string;
+}

@@ -1,15 +1,19 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CalendarView } from '@/components/CalendarView';
+import { ConvoPracticeView } from '@/components/ConvoPracticeView';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useCapsules } from '@/context/CapsuleContext';
 import { useTheme } from '@/hooks/use-theme';
+import { getConvo } from '@/services/capsuleApi';
+import { ConvoData } from '@/types/capsule';
 import { formatDateString } from '@/utils/dateHelper';
+
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<'topics' | 'communication'>('topics');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -20,6 +24,10 @@ export default function HomeScreen() {
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   });
+  const [convoData, setConvoData] = useState<ConvoData | null>(null);
+  const [isConvoLoading, setIsConvoLoading] = useState<boolean>(false);
+  const [convoError, setConvoError] = useState<string | null>(null);
+
   const theme = useTheme();
   const router = useRouter();
   const { sections = [], isLoading, error, refresh } = useCapsules();
@@ -30,6 +38,26 @@ export default function HomeScreen() {
       params: { date: selectedDate },
     } as any);
   };
+
+  const loadConvo = async () => {
+    if (!selectedDate) return;
+    setIsConvoLoading(true);
+    setConvoError(null);
+    try {
+      const data = await getConvo(selectedDate);
+      setConvoData(data);
+    } catch (err) {
+      console.error('[HomeScreen] Failed to load convo:', err);
+      setConvoError('Failed to load conversation.');
+      setConvoData(null);
+    } finally {
+      setIsConvoLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadConvo();
+  }, [selectedDate]);
 
   return (
     <ThemedView style={styles.container}>
@@ -71,11 +99,36 @@ export default function HomeScreen() {
         )}
 
         {activeTab === 'communication' ? (
-          <View style={styles.blankTabContainer}>
-            <ThemedText type="small" themeColor="textSecondary" style={styles.blankTabText}>
-              Communication tab is blank for now.
-            </ThemedText>
-          </View>
+          isConvoLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+              <ThemedText type="code" style={styles.loadingText} themeColor="textSecondary">
+                FETCHING CONVERSATION...
+              </ThemedText>
+            </View>
+          ) : convoError ? (
+            <View style={styles.errorContainer}>
+              <ThemedText type="default" style={styles.errorText}>
+                {convoError}
+              </ThemedText>
+              <Pressable onPress={loadConvo} style={styles.retryButton}>
+                <ThemedText type="code" style={styles.retryText}>
+                  RETRY
+                </ThemedText>
+              </Pressable>
+            </View>
+          ) : convoData ? (
+            <ConvoPracticeView convo={convoData} />
+          ) : (
+            <View style={styles.blankTabContainer}>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.blankTabText}>
+                No conversation available for this edition.
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" style={[styles.blankTabText, { marginTop: 4, fontSize: 11 }]}>
+                Try selecting a different date from the calendar.
+              </ThemedText>
+            </View>
+          )
         ) : error ? (
           <View style={styles.errorContainer}>
             <ThemedText type="default" style={styles.errorText}>

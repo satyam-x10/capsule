@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Capsule } from '../types/capsule';
+import { Capsule, ConvoData } from '../types/capsule';
 
 const CAPSULES_DAY_CACHE_PREFIX = '@capsules_day_cache_';
 
@@ -179,6 +179,67 @@ export async function getSections(): Promise<SectionInfo[]> {
     }
   } catch (error) {
     console.error('[capsuleApi] Failed to retrieve dynamic sections:', error);
+    throw error;
+  }
+}
+
+const CONVO_CACHE_PREFIX = '@convo_cache_';
+const CONVO_REMOTE_FOLDER_URL = 'https://raw.githubusercontent.com/satyam-x10/capsule/dev/data/convo';
+
+/**
+ * Fetches the daily conversation (dialogue, vocabulary, takeaways) for a specific day.
+ * URL format: CONVO_REMOTE_FOLDER_URL/MM-YY/DD.json
+ */
+export async function getConvo(dateStr: string): Promise<ConvoData | null> {
+  const cacheKey = `${CONVO_CACHE_PREFIX}${dateStr}`;
+
+  try {
+    // Check cache first
+    const cachedData = await safeStorage.getItem(cacheKey);
+    if (cachedData && cachedData !== 'undefined') {
+      try {
+        const parsed = JSON.parse(cachedData);
+        if (parsed && typeof parsed === 'object' && parsed.conversation) {
+          return parsed as ConvoData;
+        }
+      } catch (e) {
+        console.warn('[capsuleApi] Failed to parse cached convo:', e);
+      }
+    }
+
+    const monthId = getMonthIdFromDate(dateStr);
+    const dayId = getDayIdFromDate(dateStr);
+
+    if (!monthId || !dayId) {
+      throw new Error(`Invalid date string for convo: ${dateStr}`);
+    }
+
+    const targetUrl = `${CONVO_REMOTE_FOLDER_URL}/${monthId}/${dayId}.json`;
+    const response = await fetch(targetUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log(`[capsuleApi] Convo not found for ${dateStr} at ${targetUrl}`);
+        return null;
+      }
+      throw new Error(`Failed to fetch convo for ${dateStr} from ${targetUrl}: status ${response.status}`);
+    }
+
+    const fetchedData = await response.json();
+    if (fetchedData && typeof fetchedData === 'object' && fetchedData.conversation) {
+      // Cache the loaded convo data permanently
+      await safeStorage.setItem(cacheKey, JSON.stringify(fetchedData));
+      return fetchedData as ConvoData;
+    } else {
+      throw new Error('Fetched convo data is not valid JSON object');
+    }
+  } catch (error) {
+    console.error(`[capsuleApi] Failed to retrieve convo for date ${dateStr}:`, error);
     throw error;
   }
 }
