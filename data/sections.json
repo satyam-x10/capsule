@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "name": "AI & Emerging Technology",
+        "description": "LLMs, RAG systems, AI agents, multimodal models, cloud AI services, and emerging technology trends."
+    },
+    {
+        "id": 2,
+        "name": "Software Engineering Fundamentals",
+        "description": "Data structures, algorithms, system design, distributed systems, databases, networking, and operating systems."
+    },
+    {
+        "id": 3,
+        "name": "Product & Business",
+        "description": "Product strategy, business models, SaaS economics, customer behavior, growth metrics, and market dynamics."
+    },
+    {
+        "id": 4,
+        "name": "Communication & Leadership",
+        "description": "Technical communication, stakeholder management, negotiation, leadership, presentations, and decision-making."
+    },
+    {
+        "id": 5,
+        "name": "Wealth & Life Management",
+        "description": "Investing, personal finance, taxation, insurance, productivity systems, career planning, and risk management."
+    },
+    {
+        "id": 6,
+        "name": "Human Knowledge",
+        "description": "Psychology, economics, history, philosophy, science, geopolitics, and human behavior."
+    }
+]

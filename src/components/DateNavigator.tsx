@@ -1,8 +1,8 @@
 import { Spacing } from '@/constants/theme';
+import { formatDateString } from '@/utils/dateHelper';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
-import { formatDateString } from '@/utils/dateHelper';
 
 interface DateNavigatorProps {
   selectedDate: string;
@@ -14,7 +14,8 @@ export function DateNavigator({ selectedDate, onDateChange, availableDates }: Da
   const currentIndex = availableDates.indexOf(selectedDate);
 
   const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex < availableDates.length - 1;
+  const hasNext = true;
+  // const hasNext = currentIndex < availableDates.length - 1;
 
   const handlePrev = () => {
     if (hasPrev) {

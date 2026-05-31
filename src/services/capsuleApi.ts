@@ -4,7 +4,7 @@ import { Capsule } from '../types/capsule';
 const CAPSULES_DAY_CACHE_PREFIX = '@capsules_day_cache_';
 
 // The remote base URL folder under which monthly issue folders are stored (e.g. .../months/05-26/27.json)
-const REMOTE_FOLDER_URL = 'https://raw.githubusercontent.com/satyam-x10/capsule/data/data';
+const REMOTE_FOLDER_URL = 'https://raw.githubusercontent.com/satyam-x10/capsule/dev/data';
 
 // Fallback in-memory and window.localStorage storage when AsyncStorage native module is null (web / unlinked)
 class FallbackStorage {
@@ -157,9 +157,9 @@ export interface SectionInfo {
 export async function getSections(): Promise<SectionInfo[]> {
   try {
     // Attempt to fetch sections.json from raw git root (replacing /data subfolder)
-    // base URL is: https://raw.githubusercontent.com/satyam-x10/capsule/data/data
-    // So sections.json is at: https://raw.githubusercontent.com/satyam-x10/capsule/data/sections.json
-    const targetUrl = 'https://raw.githubusercontent.com/satyam-x10/capsule/data/sections.json';
+    // base URL is: https://raw.githubusercontent.com/satyam-x10/capsule/dev/data
+    // So sections.json is at: https://raw.githubusercontent.com/satyam-x10/capsule/dev/sections.json
+    const targetUrl = 'https://raw.githubusercontent.com/satyam-x10/capsule/dev/sections.json';
     const response = await fetch(targetUrl, {
       method: 'GET',
       headers: {
