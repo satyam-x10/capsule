@@ -26,7 +26,7 @@ export default function HomeScreen() {
             Hi, Satyam
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
-            Learn these today as of {new Date().toLocaleDateString()}
+            Learn these today as of {new Date().toDateString().toLocaleString('en-us')}
           </ThemedText>
         </View>
 
