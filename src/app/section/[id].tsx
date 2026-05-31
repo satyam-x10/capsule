@@ -16,7 +16,7 @@ import { generateDatesForMonth } from '@/utils/dateHelper';
 export default function SectionDetailScreen() {
   const theme = useTheme();
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
   const { dailyCapsules, sections = [], isLoading, fetchDayCapsules } = useCapsules();
   const [sectionError, setSectionError] = useState<boolean>(false);
 
@@ -43,9 +43,9 @@ export default function SectionDetailScreen() {
     return generateDatesForMonth(monthId);
   }, []);
 
-  // Selected date state (defaults to the latest day)
+  // Selected date state (defaults to the route date parameter, or the latest day)
   const [selectedDate, setSelectedDate] = useState<string>(() => {
-    return availableDates[availableDates.length - 1] || '';
+    return date || availableDates[availableDates.length - 1] || '';
   });
 
   // Fetch the daily capsule for the selected date on-demand

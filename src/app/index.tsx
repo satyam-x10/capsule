@@ -1,20 +1,34 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { CalendarView } from '@/components/CalendarView';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useCapsules } from '@/context/CapsuleContext';
 import { useTheme } from '@/hooks/use-theme';
-
+import { formatDateString } from '@/utils/dateHelper';
 export default function HomeScreen() {
+  const [activeTab, setActiveTab] = useState<'topics' | 'communication'>('topics');
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  });
   const theme = useTheme();
   const router = useRouter();
   const { sections = [], isLoading, error, refresh } = useCapsules();
 
   const handleSectionPress = (sectionId: number) => {
-    router.push(`/section/${sectionId}` as any);
+    router.push({
+      pathname: `/section/${sectionId}`,
+      params: { date: selectedDate },
+    } as any);
   };
 
   return (
@@ -22,15 +36,47 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         {/* App Branding Header */}
         <View style={styles.header}>
-          <ThemedText type="subtitle" style={styles.brandTitle}>
-            Hi, Satyam
-          </ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
-            Learn these today as of {new Date().toDateString().toLocaleString('en-us')}
-          </ThemedText>
+          <View style={styles.headerContent}>
+            <View style={styles.headerTextContainer}>
+              <ThemedText type="subtitle" style={styles.brandTitle}>
+                Hi, Satyam
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
+                Learn these today as of {formatDateString(selectedDate)}
+              </ThemedText>
+            </View>
+            <Pressable
+              onPress={() => setShowCalendar(!showCalendar)}
+              style={({ pressed }) => [
+                styles.calendarToggleButton,
+                showCalendar && styles.calendarActiveButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <ThemedText style={[styles.calendarToggleText, showCalendar && styles.calendarActiveText]}>
+                {showCalendar ? 'Close ✕' : '📅'}
+              </ThemedText>
+            </Pressable>
+          </View>
         </View>
 
-        {error ? (
+        {showCalendar && (
+          <CalendarView
+            selectedDate={selectedDate}
+            onDateSelect={(date) => {
+              setSelectedDate(date);
+              setShowCalendar(false);
+            }}
+          />
+        )}
+
+        {activeTab === 'communication' ? (
+          <View style={styles.blankTabContainer}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.blankTabText}>
+              Communication tab is blank for now.
+            </ThemedText>
+          </View>
+        ) : error ? (
           <View style={styles.errorContainer}>
             <ThemedText type="default" style={styles.errorText}>
               An error occurred while loading content.
@@ -54,7 +100,7 @@ export default function HomeScreen() {
             style={styles.scrollView}
             contentContainerStyle={[
               styles.scrollContent,
-              { paddingBottom: BottomTabInset + Spacing.four },
+              { paddingBottom: BottomTabInset + Spacing.six + 40 },
             ]}
             showsVerticalScrollIndicator={false}
           >
@@ -87,6 +133,45 @@ export default function HomeScreen() {
             })}
           </ScrollView>
         )}
+
+        {/* Floating Custom Bottom Tab Bar */}
+        <View style={styles.tabBarContainer}>
+          <Pressable
+            onPress={() => setActiveTab('topics')}
+            style={({ pressed }) => [
+              styles.tabButton,
+              activeTab === 'topics' && styles.activeTabButton,
+              pressed && styles.tabBarPressed,
+            ]}
+          >
+            <ThemedText
+              style={[
+                styles.tabText,
+                activeTab === 'topics' && styles.activeTabText,
+              ]}
+            >
+              Topics
+            </ThemedText>
+          </Pressable>
+
+          <Pressable
+            onPress={() => setActiveTab('communication')}
+            style={({ pressed }) => [
+              styles.tabButton,
+              activeTab === 'communication' && styles.activeTabButton,
+              pressed && styles.tabBarPressed,
+            ]}
+          >
+            <ThemedText
+              style={[
+                styles.tabText,
+                activeTab === 'communication' && styles.activeTabText,
+              ]}
+            >
+              Communication
+            </ThemedText>
+          </Pressable>
+        </View>
       </SafeAreaView>
     </ThemedView>
   );
@@ -111,6 +196,37 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1C1D1F',
     alignSelf: 'stretch',
     marginBottom: Spacing.two,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  calendarToggleButton: {
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#1C1D1F',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    marginLeft: Spacing.two,
+  },
+  calendarActiveButton: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
+  },
+  calendarToggleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B0B4BA',
+  },
+  calendarActiveText: {
+    color: '#000000',
+    fontWeight: '700',
   },
   brandTitle: {
     fontSize: 28,
@@ -216,5 +332,54 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 1.5,
     color: '#FFFFFF',
+  },
+  tabBarContainer: {
+    position: 'absolute',
+    bottom: Platform.OS === 'ios' ? 34 : 24,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(28, 29, 31, 0.92)',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    borderRadius: 30,
+    padding: 6,
+    alignSelf: 'center',
+    width: 320,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    zIndex: 100,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 24,
+  },
+  activeTabButton: {
+    backgroundColor: '#2E3135',
+  },
+  tabText: {
+    fontWeight: '600',
+    fontSize: 13,
+    color: '#B0B4BA',
+  },
+  activeTabText: {
+    color: '#FFFFFF',
+  },
+  tabBarPressed: {
+    opacity: 0.85,
+  },
+  blankTabContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  blankTabText: {
+    fontSize: 14,
+    color: '#B0B4BA',
   },
 });
