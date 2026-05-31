@@ -1,3 +1,23 @@
+html, body, #root, #root > div, #__next, [data-reactroot] {
+  background-color: #000000 !important;
+}
+
+div[style*="background-color: rgb(242, 242, 242)"] {
+  background-color: #000000 !important;
+}
+
+div[style*="position: absolute"][style*="width: 100%"][style*="height: 100%"],
+div[style*="position:absolute"][style*="width:100%"][style*="height:100%"] {
+  background-color: #000000 !important;
+}
+
+/* Target react-native-screens absolute wrappers that have default white/light backgrounds */
+div[style*="position: absolute"][style*="left: 0px"][style*="top: 0px"][style*="right: 0px"][style*="bottom: 0px"][style*="background-color: rgb(255, 255, 255)"],
+div[style*="position: absolute"][style*="left: 0px"][style*="top: 0px"][style*="right: 0px"][style*="bottom: 0px"][style*="background-color: white"],
+div[style*="position: absolute"][style*="left: 0px"][style*="top: 0px"][style*="right: 0px"][style*="bottom: 0px"][style*="background-color: rgb(242, 242, 242)"] {
+  background-color: #000000 !important;
+}
+
 :root {
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,

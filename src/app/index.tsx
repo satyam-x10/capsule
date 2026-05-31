@@ -1,6 +1,5 @@
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, ScrollView, StyleSheet, View, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CalendarView } from '@/components/CalendarView';
@@ -12,7 +11,7 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useCapsules } from '@/context/CapsuleContext';
 import { useTheme } from '@/hooks/use-theme';
 import { getConvo } from '@/services/capsuleApi';
-import { ConvoData } from '@/types/capsule';
+import { ConvoData, Capsule } from '@/types/capsule';
 import { formatDateString } from '@/utils/dateHelper';
 
 const getDateSeed = (dateStr: string): number => {
@@ -24,8 +23,20 @@ const getDateSeed = (dateStr: string): number => {
   return Math.abs(hash) % 10000;
 };
 
+const getSectionEmoji = (id: number): string => {
+  switch (id) {
+    case 1: return '🤖';
+    case 2: return '💻';
+    case 3: return '📈';
+    case 4: return '🗣️';
+    case 5: return '💰';
+    case 6: return '🧠';
+    default: return '📦';
+  }
+};
+
 export default function HomeScreen() {
-  const [activeTab, setActiveTab] = useState<'home' | 'topics' | 'communication'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'capsules' | 'convo'>('home');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const now = new Date();
@@ -38,15 +49,26 @@ export default function HomeScreen() {
   const [isConvoLoading, setIsConvoLoading] = useState<boolean>(false);
   const [convoError, setConvoError] = useState<string | null>(null);
 
-  const theme = useTheme();
-  const router = useRouter();
-  const { sections = [], isLoading, error, refresh } = useCapsules();
+  const [selectedCapsule, setSelectedCapsule] = useState<Capsule | null>(null);
+  const [isCapsuleModalOpen, setIsCapsuleModalOpen] = useState<boolean>(false);
+  const [isCapsuleLoading, setIsCapsuleLoading] = useState<boolean>(false);
 
-  const handleSectionPress = (sectionId: number) => {
-    router.push({
-      pathname: `/section/${sectionId}`,
-      params: { date: selectedDate },
-    } as any);
+  const theme = useTheme();
+  const { sections = [], dailyCapsules, isLoading, error, refresh, fetchDayCapsules } = useCapsules();
+
+  const handleSectionPress = async (sectionId: number) => {
+    setIsCapsuleModalOpen(true);
+    setIsCapsuleLoading(true);
+    try {
+      const dayCapsules = await fetchDayCapsules(selectedDate);
+      const capsule = dayCapsules.find((c) => c.sectionId === sectionId) || null;
+      setSelectedCapsule(capsule);
+    } catch (err) {
+      console.error('[HomeScreen] Failed to load day capsule:', err);
+      setSelectedCapsule(null);
+    } finally {
+      setIsCapsuleLoading(false);
+    }
   };
 
   const loadConvo = async () => {
@@ -67,6 +89,11 @@ export default function HomeScreen() {
 
   useEffect(() => {
     loadConvo();
+    if (selectedDate) {
+      fetchDayCapsules(selectedDate).catch(err => {
+        console.error('[HomeScreen] Pre-fetching day capsules failed:', err);
+      });
+    }
   }, [selectedDate]);
 
   return (
@@ -101,12 +128,12 @@ export default function HomeScreen() {
         )}
 
         {/* Topics Header */}
-        {activeTab === 'topics' && (
+        {activeTab === 'capsules' && (
           <View style={styles.header}>
             <View style={styles.headerContent}>
               <View style={styles.headerTextContainer}>
                 <ThemedText type="subtitle" style={styles.brandTitle}>
-                  Daily Topics
+                  Daily Capsules
                 </ThemedText>
                 <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
                   Choose a category to start learning for {formatDateString(selectedDate)}
@@ -143,7 +170,7 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.imageWrapper}>
                   <Image
-                    source={{ uri: `https://picsum.photos/600/400?random=${getDateSeed(selectedDate)}` }}
+                    source={{ uri: `https://picsum.photos/600/850?random=${getDateSeed(selectedDate)}` }}
                     style={styles.randomImage}
                     resizeMode="cover"
                   />
@@ -151,7 +178,7 @@ export default function HomeScreen() {
               </View>
             </ScrollView>
           </View>
-        ) : activeTab === 'communication' ? (
+        ) : activeTab === 'convo' ? (
           isConvoLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#FFFFFF" />
@@ -221,18 +248,16 @@ export default function HomeScreen() {
                   ]}
                 >
                   <ThemedView type="backgroundElement" style={styles.card}>
-                    <View style={styles.cardContent}>
-
-
-                      <ThemedText type="default" style={styles.sectionTitle} numberOfLines={2}>
-                        {section.name}
-                      </ThemedText>
-
-                      <ThemedText type="small" style={styles.description} themeColor="textSecondary" numberOfLines={3}>
-                        {section.description}
+                    <View style={styles.emojiContainer}>
+                      <ThemedText style={styles.sectionEmojiBg}>
+                        {getSectionEmoji(section.id)}
                       </ThemedText>
                     </View>
-
+                    <View style={styles.cardContent}>
+                      <ThemedText type="default" style={styles.sectionTitle} numberOfLines={3}>
+                        {section.name}
+                      </ThemedText>
+                    </View>
                   </ThemedView>
                 </Pressable>
               );
@@ -261,41 +286,136 @@ export default function HomeScreen() {
           </Pressable>
 
           <Pressable
-            onPress={() => setActiveTab('topics')}
+            onPress={() => setActiveTab('capsules')}
             style={({ pressed }) => [
               styles.tabButton,
-              activeTab === 'topics' && styles.activeTabButton,
+              activeTab === 'capsules' && styles.activeTabButton,
               pressed && styles.tabBarPressed,
             ]}
           >
             <ThemedText
               style={[
                 styles.tabText,
-                activeTab === 'topics' && styles.activeTabText,
+                activeTab === 'capsules' && styles.activeTabText,
               ]}
             >
-              Topics
+              Capsules
             </ThemedText>
           </Pressable>
 
           <Pressable
-            onPress={() => setActiveTab('communication')}
+            onPress={() => setActiveTab('convo')}
             style={({ pressed }) => [
               styles.tabButton,
-              activeTab === 'communication' && styles.activeTabButton,
+              activeTab === 'convo' && styles.activeTabButton,
               pressed && styles.tabBarPressed,
             ]}
           >
             <ThemedText
               style={[
                 styles.tabText,
-                activeTab === 'communication' && styles.activeTabText,
+                activeTab === 'convo' && styles.activeTabText,
               ]}
             >
-              Communication
+              Convo
             </ThemedText>
           </Pressable>
         </View>
+
+        {/* Full-Screen Capsule Reader Modal */}
+        <Modal
+          visible={isCapsuleModalOpen}
+          animationType="slide"
+          transparent={false}
+          onRequestClose={() => setIsCapsuleModalOpen(false)}
+        >
+          <ThemedView style={styles.modalContainer}>
+            <SafeAreaView style={styles.modalSafeArea} edges={['top', 'left', 'right', 'bottom']}>
+              {/* Modal Header */}
+              <View style={styles.modalHeader}>
+                <Pressable onPress={() => setIsCapsuleModalOpen(false)} style={styles.modalBackButton}>
+                  <ThemedText type="code" style={styles.modalBackText}>
+                    ← CLOSE
+                  </ThemedText>
+                </Pressable>
+                {selectedCapsule && (
+                  <ThemedText type="code" style={styles.modalHeaderCategory} themeColor="textSecondary">
+                    {selectedCapsule.category.toUpperCase()}
+                  </ThemedText>
+                )}
+              </View>
+
+              {isCapsuleLoading ? (
+                <View style={styles.modalLoadingContainer}>
+                  <ActivityIndicator size="large" color="#FFFFFF" />
+                  <ThemedText type="code" style={styles.modalLoadingText} themeColor="textSecondary">
+                    LOADING CAPSULE...
+                  </ThemedText>
+                </View>
+              ) : selectedCapsule ? (
+                <ScrollView
+                  style={styles.modalScrollView}
+                  contentContainerStyle={styles.modalScrollContent}
+                  showsVerticalScrollIndicator={false}
+                >
+                  {/* Title & Metadata */}
+                  <View style={styles.modalTitleSection}>
+                    <ThemedText type="subtitle" style={styles.modalTitle}>
+                      {selectedCapsule.title}
+                    </ThemedText>
+                    <View style={styles.modalMetadata}>
+                      <ThemedText type="code" style={styles.modalMetaText} themeColor="textSecondary">
+                        {selectedCapsule.readTime}
+                      </ThemedText>
+                      <ThemedText type="code" style={styles.modalMetaDivider} themeColor="textSecondary">
+                        •
+                      </ThemedText>
+                      <ThemedText type="code" style={styles.modalMetaText} themeColor="textSecondary">
+                        Published: {formatDateString(selectedCapsule.date)}
+                      </ThemedText>
+                    </View>
+                  </View>
+
+                  {/* Divider */}
+                  <View style={styles.modalDivider} />
+
+                  {/* Reading Content */}
+                  <View style={styles.modalContentSection}>
+                    {selectedCapsule.content.split('\n\n').map((p, idx) => (
+                      <ThemedText key={idx} style={styles.modalParagraph}>
+                        {p}
+                      </ThemedText>
+                    ))}
+                  </View>
+
+                  {/* Takeaway Section */}
+                  <View style={styles.modalTakeawayContainer}>
+                    <View style={styles.modalTakeawayAccent} />
+                    <View style={styles.modalTakeawayContent}>
+                      <ThemedText type="code" style={styles.modalTakeawayLabel}>
+                        KEY TAKEAWAY
+                      </ThemedText>
+                      <ThemedText style={styles.modalTakeawayText}>
+                        {selectedCapsule.takeaway}
+                      </ThemedText>
+                    </View>
+                  </View>
+                </ScrollView>
+              ) : (
+                <View style={styles.modalLoadingContainer}>
+                  <ThemedText type="default" style={styles.modalLoadingText}>
+                    No capsule available for this section today.
+                  </ThemedText>
+                  <Pressable onPress={() => setIsCapsuleModalOpen(false)} style={styles.modalRetryButton}>
+                    <ThemedText type="code" style={styles.modalRetryText}>
+                      GO BACK
+                    </ThemedText>
+                  </Pressable>
+                </View>
+              )}
+            </SafeAreaView>
+          </ThemedView>
+        </Modal>
       </SafeAreaView>
     </ThemedView>
   );
@@ -391,25 +511,45 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     padding: Spacing.three,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#2E3135',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'hidden',
   },
   cardContent: {
-    gap: Spacing.one,
-    flex: 1,
+    zIndex: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   pressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
-    lineHeight: 20,
-    marginTop: Spacing.half,
+    lineHeight: 18,
+    textAlign: 'center',
+  },
+  emojiContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  sectionEmojiBg: {
+    fontSize: 100,
+    lineHeight: 100,
+    opacity: 0.08,
+    textAlign: 'center',
   },
   capsuleCount: {
     fontSize: 9,
@@ -583,7 +723,7 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     width: '100%',
-    aspectRatio: 1.5,
+    aspectRatio: 0.7,
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#121314',
@@ -608,5 +748,140 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+  },
+  modalSafeArea: {
+    flex: 1,
+    width: '100%',
+    maxWidth: MaxContentWidth,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.three,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1C1D1F',
+    alignSelf: 'stretch',
+  },
+  modalBackButton: {
+    paddingVertical: Spacing.one,
+  },
+  modalBackText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  modalHeaderCategory: {
+    fontSize: 11,
+    letterSpacing: 1,
+    fontWeight: 'bold',
+  },
+  modalScrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  modalScrollContent: {
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.four,
+    paddingBottom: BottomTabInset + Spacing.six,
+  },
+  modalTitleSection: {
+    gap: Spacing.two,
+    marginBottom: Spacing.three,
+  },
+  modalTitle: {
+    fontSize: 26,
+    fontWeight: '800',
+    lineHeight: 34,
+    color: '#FFFFFF',
+  },
+  modalMetadata: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  modalMetaText: {
+    fontSize: 12,
+  },
+  modalMetaDivider: {
+    fontSize: 12,
+  },
+  modalDivider: {
+    height: 1,
+    backgroundColor: '#2E3135',
+    marginVertical: Spacing.three,
+  },
+  modalContentSection: {
+    gap: Spacing.three,
+    marginBottom: Spacing.five,
+  },
+  modalParagraph: {
+    fontSize: 17,
+    lineHeight: 27,
+    color: '#E0E1E6',
+    fontWeight: '400',
+  },
+  modalTakeawayContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#111214',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: Spacing.five,
+  },
+  modalTakeawayAccent: {
+    width: 4,
+    backgroundColor: '#FFFFFF',
+  },
+  modalTakeawayContent: {
+    flex: 1,
+    padding: Spacing.three,
+    gap: Spacing.one,
+  },
+  modalTakeawayLabel: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: '#FFFFFF',
+  },
+  modalTakeawayText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#E0E1E6',
+    fontStyle: 'italic',
+  },
+  modalLoadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+    gap: Spacing.three,
+  },
+  modalLoadingText: {
+    fontSize: 12,
+    letterSpacing: 1,
+    color: '#B0B4BA',
+  },
+  modalRetryButton: {
+    paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.two,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+    borderRadius: 4,
+    marginTop: Spacing.one,
+  },
+  modalRetryText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
+    color: '#FFFFFF',
   },
 });

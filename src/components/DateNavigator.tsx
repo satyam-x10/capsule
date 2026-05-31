@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.four,
     borderBottomWidth: 1,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   dateLabelContainer: {
     alignItems: 'center',
-    flex: 1,
+    marginHorizontal: Spacing.six,
   },
   subtext: {
     fontSize: 10,
