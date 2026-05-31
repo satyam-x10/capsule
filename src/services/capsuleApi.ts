@@ -167,7 +167,9 @@ export async function getSections(): Promise<SectionInfo[]> {
       },
     });
 
-
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sections from ${targetUrl}: status ${response.status}`);
+    }
 
     const fetchedData = await response.json();
     if (Array.isArray(fetchedData)) {
