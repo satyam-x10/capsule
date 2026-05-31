@@ -156,10 +156,10 @@ export interface SectionInfo {
  */
 export async function getSections(): Promise<SectionInfo[]> {
   try {
-    // Attempt to fetch sections.json from raw git root (replacing /data subfolder)
+    // Attempt to fetch sections.json from raw git root (under /data subfolder)
     // base URL is: https://raw.githubusercontent.com/satyam-x10/capsule/dev/data
-    // So sections.json is at: https://raw.githubusercontent.com/satyam-x10/capsule/dev/sections.json
-    const targetUrl = 'https://raw.githubusercontent.com/satyam-x10/capsule/dev/sections.json';
+    // So sections.json is at: https://raw.githubusercontent.com/satyam-x10/capsule/dev/data/sections.json
+    const targetUrl = `${REMOTE_FOLDER_URL}/sections.json`;
     const response = await fetch(targetUrl, {
       method: 'GET',
       headers: {
