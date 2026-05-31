@@ -1,22 +1,26 @@
 [
   {
-    "name": "AI & ML",
-    "description": "Neural network architectures, self-attention mechanics, and model optimizations."
+    "name": "AI & Emerging Technology",
+    "description": "LLMs, RAG systems, AI agents, multimodal models, cloud AI services, and emerging technology trends."
   },
   {
-    "name": "Data Structures & Algorithms",
-    "description": "B-Trees, Bloom filters, cache designs, and space-efficient architectures."
+    "name": "Software Engineering Fundamentals",
+    "description": "Data structures, algorithms, system design, distributed systems, databases, networking, and operating systems."
   },
   {
-    "name": "System Design",
-    "description": "Distributed consensus, logical time, conflict resolution, and CQRS setups."
+    "name": "Product & Business",
+    "description": "Product strategy, business models, SaaS economics, customer behavior, growth metrics, and market dynamics."
   },
   {
-    "name": "Database Internals",
-    "description": "Storage engines, WAL logs, MVCC models, and crash recovery systems."
+    "name": "Communication & Leadership",
+    "description": "Technical communication, stakeholder management, negotiation, leadership, presentations, and decision-making."
   },
   {
-    "name": "Web Performance & Networking",
-    "description": "UDP-based QUIC, TCP BBR congestion modeling, and fast TLS encryption."
+    "name": "Wealth & Life Management",
+    "description": "Investing, personal finance, taxation, insurance, productivity systems, career planning, and risk management."
+  },
+  {
+    "name": "Human Knowledge",
+    "description": "Psychology, economics, history, philosophy, science, geopolitics, and human behavior."
   }
 ]
