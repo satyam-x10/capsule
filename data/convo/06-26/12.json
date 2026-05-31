@@ -1,0 +1,137 @@
+{
+    "title": "API Protection & Professional Boundaries",
+    "theme": "Security & Communication",
+    "conversation": [
+        {
+            "speaker": "Rahul",
+            "text": "We need to protect our API from excessive solicitation. Users are spamming the model."
+        },
+        {
+            "speaker": "Priya",
+            "text": "We can enforce formatting constraints and add a rate limiter at the gateway."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "How should the rate limiter track requests? A rolling log or token bucket?"
+        },
+        {
+            "speaker": "Priya",
+            "text": "A sliding window algorithm works best. It prevents traffic spikes at the window boundary."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "Yes, it tracks requests within a 60-second window, which is very fair."
+        },
+        {
+            "speaker": "Priya",
+            "text": "What is the total addressable market for our API product?"
+        },
+        {
+            "speaker": "Rahul",
+            "text": "It's around $500 million globally, but we only need a 5% market share to be highly profitable."
+        },
+        {
+            "speaker": "Priya",
+            "text": "To capture that market share, we need strict feature prioritization."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "Yes, we must set clear boundaries with the sales team. They want us to build custom features for everyone."
+        },
+        {
+            "speaker": "Priya",
+            "text": "Setting boundaries is critical to protect our engineering resources from burnout."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "On the recruitment front, our candidate rejected our initial compensation package."
+        },
+        {
+            "speaker": "Priya",
+            "text": "Are we going to make a counteroffer? We really need their backend expertise."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "We can make a modest counteroffer, but we must stay within our budget limits."
+        },
+        {
+            "speaker": "Priya",
+            "text": "We should apply Occam's razor when debugging the API performance issue."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "Yes, the principle of parsimony suggests the simplest explanation is usually the correct one."
+        },
+        {
+            "speaker": "Priya",
+            "text": "Right, let's look for simple configuration errors before blaming the network stack."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "I made an assumption that the database was the bottleneck, but I should verify it."
+        },
+        {
+            "speaker": "Priya",
+            "text": "Never trust an untested assumption. Let's look at the telemetry dashboard."
+        },
+        {
+            "speaker": "Rahul",
+            "text": "I'll run the load tests to collect raw metrics."
+        },
+        {
+            "speaker": "Priya",
+            "text": "Great. I'll configure the sliding window rate limiter."
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "solicitation",
+            "meaning": "the act of asking for or trying to obtain something from someone; prompting an AI"
+        },
+        {
+            "word": "formatting constraints",
+            "meaning": "rules that dictate the exact structure or layout of output data"
+        },
+        {
+            "word": "rate limiter",
+            "meaning": "a mechanism to limit the number of requests a client can make in a given timeframe"
+        },
+        {
+            "word": "window",
+            "meaning": "a specific time interval used to track and reset rate-limiting request counts"
+        },
+        {
+            "word": "addressable market",
+            "meaning": "the total revenue opportunity available if a product achieved 100% market share"
+        },
+        {
+            "word": "market share",
+            "meaning": "the percentage of a market's total sales earned by a particular company"
+        },
+        {
+            "word": "prioritization",
+            "meaning": "the process of organizing tasks or features by order of importance or urgency"
+        },
+        {
+            "word": "boundaries",
+            "meaning": "limits set to protect one's time, resources, or personal well-being"
+        },
+        {
+            "word": "compensation package",
+            "meaning": "the total combination of salary, equity, and benefits offered for a role"
+        },
+        {
+            "word": "counteroffer",
+            "meaning": "a retaliatory offer made in response to an initial proposal or salary bid"
+        },
+        {
+            "word": "parsimony",
+            "meaning": "extreme economy or frugality; in science, choosing the simplest explanation"
+        },
+        {
+            "word": "assumption",
+            "meaning": "a belief accepted as true without formal proof or verification"
+        }
+    ],
+    "takeaway": "Setting limits — whether through database rate limiters or team boundaries — is essential to protect system health and prevent overload."
+}
