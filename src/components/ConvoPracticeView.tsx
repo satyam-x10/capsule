@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View, Platform } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View, Platform, Modal, KeyboardAvoidingView } from 'react-native';
 import { Spacing } from '@/constants/theme';
 import { ConvoData, ConvoUtterance, VocabularyWord } from '@/types/capsule';
 import { ThemedText } from './themed-text';
@@ -12,8 +12,12 @@ interface ConvoPracticeViewProps {
 export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
   const { conversation, vocabulary, title, theme, takeaway } = convo;
 
+  // Sub-tab Navigation state
+  const [activeSubTab, setActiveSubTab] = useState<'dialogue' | 'vocabulary'>('dialogue');
+
   // Dialogue Practice States
-  const [selectedUtteranceIndex, setSelectedUtteranceIndex] = useState<number | null>(0);
+  const [selectedUtteranceIndex, setSelectedUtteranceIndex] = useState<number | null>(null);
+  const [isPracticeModalOpen, setIsPracticeModalOpen] = useState<boolean>(false);
   const [typedText, setTypedText] = useState<string>('');
   const typingInputRef = useRef<TextInput>(null);
 
@@ -37,9 +41,10 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
   const handleSelectUtterance = (idx: number) => {
     setSelectedUtteranceIndex(idx);
     setTypedText('');
+    setIsPracticeModalOpen(true);
     setTimeout(() => {
       typingInputRef.current?.focus();
-    }, 100);
+    }, 150);
   };
 
   const handleNextUtterance = () => {
@@ -48,7 +53,7 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
     }
   };
 
-  // Real-time character accuracy matching for dialogue practice
+  // Real-time character accuracy matching for dialogue practice (case-insensitive)
   const renderTypedCharacters = () => {
     if (!activeUtterance) return null;
     const target = activeUtterance.text;
@@ -61,7 +66,8 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
           let charBg = 'transparent';
 
           if (index < typedText.length) {
-            if (typedText[index] === char) {
+            // Case-insensitive comparison for typing feedback
+            if (typedText[index].toLowerCase() === char.toLowerCase()) {
               charColor = '#4CAF50'; // Green (correct)
             } else {
               charColor = '#F44336'; // Red (incorrect)
@@ -90,9 +96,10 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
     );
   };
 
-  const isDialogueCompleted = activeUtterance && typedText === activeUtterance.text;
+  // Case-insensitive match check for completion
+  const isDialogueCompleted = activeUtterance && typedText.toLowerCase() === activeUtterance.text.toLowerCase();
 
-  // Vocab Mathing Logic
+  // Vocab Matching Logic
   const handleVocabAnswerChange = (shuffledIdx: number, val: string) => {
     setVocabAnswers(prev => ({
       ...prev,
@@ -100,7 +107,7 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
     }));
   };
 
-  // Calculate score/correct matches in vocabulary
+  // Calculate score/correct matches in vocabulary (case-insensitive)
   const vocabCorrectStatus = useMemo(() => {
     const status: Record<number, boolean> = {};
     shuffledMeanings.forEach((item, idx) => {
@@ -131,197 +138,264 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
         </ThemedText>
       </View>
 
-      {/* SECTION 1: DIALOGUE TRAINER */}
-      <View style={styles.sectionHeader}>
-        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.sectionLabel}>
-          SECTION 1 • DIALOGUE TYPING PRACTICE
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Tap a bubble to practice typing it.
-        </ThemedText>
+      {/* Premium Horizontal Sub-Tabs Switcher */}
+      <View style={styles.subTabBar}>
+        <Pressable
+          onPress={() => setActiveSubTab('dialogue')}
+          style={({ pressed }) => [
+            styles.subTabButton,
+            activeSubTab === 'dialogue' && styles.activeSubTabButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <ThemedText style={[styles.subTabText, activeSubTab === 'dialogue' && styles.activeSubTabText]}>
+            Dialogue Practice
+          </ThemedText>
+        </Pressable>
+
+        <Pressable
+          onPress={() => setActiveSubTab('vocabulary')}
+          style={({ pressed }) => [
+            styles.subTabButton,
+            activeSubTab === 'vocabulary' && styles.activeSubTabButton,
+            pressed && styles.pressed,
+          ]}
+        >
+          <ThemedText style={[styles.subTabText, activeSubTab === 'vocabulary' && styles.activeSubTabText]}>
+            Vocabulary Game
+          </ThemedText>
+        </Pressable>
       </View>
 
-      <View style={styles.dialogueList}>
-        {conversation.map((utterance, idx) => {
-          const isSelected = selectedUtteranceIndex === idx;
-          const isSpeakerA = idx % 2 === 0;
-
-          return (
-            <Pressable
-              key={`convo-line-${idx}`}
-              onPress={() => handleSelectUtterance(idx)}
-              style={[
-                styles.dialogueRow,
-                isSpeakerA ? styles.rowLeft : styles.rowRight,
-              ]}
-            >
-              <View
-                style={[
-                  styles.bubble,
-                  isSpeakerA ? styles.bubbleLeft : styles.bubbleRight,
-                  isSelected && styles.bubbleSelected,
-                ]}
-              >
-                <ThemedText style={styles.speakerName} themeColor="textSecondary">
-                  {utterance.speaker}
-                </ThemedText>
-                <ThemedText style={styles.bubbleText}>
-                  {utterance.text}
-                </ThemedText>
-              </View>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {/* Typing Workspace */}
-      {activeUtterance && (
-        <ThemedView type="backgroundElement" style={styles.practiceCard}>
-          <View style={styles.practiceHeader}>
-            <ThemedText type="smallBold" style={styles.practiceTitle}>
-              Practicing {conversation[selectedUtteranceIndex!].speaker}'s Line
+      {/* Conditionally Render dialogue list vs vocabulary matching */}
+      {activeSubTab === 'dialogue' ? (
+        <View>
+          <View style={styles.sectionHeader}>
+            <ThemedText type="smallBold" themeColor="textSecondary" style={styles.sectionLabel}>
+              DIALOGUE TYPING PRACTICE
             </ThemedText>
-            {isDialogueCompleted && (
-              <ThemedText type="smallBold" style={styles.completedTag}>
-                SUCCESS!
-              </ThemedText>
-            )}
+            <ThemedText type="small" themeColor="textSecondary">
+              Tap any bubble to practice typing it.
+            </ThemedText>
           </View>
 
-          {/* Render target characters styled based on typing */}
-          <View style={styles.targetDisplay}>
-            {renderTypedCharacters()}
-          </View>
+          <View style={styles.dialogueList}>
+            {conversation.map((utterance, idx) => {
+              const isSelected = selectedUtteranceIndex === idx;
+              const isSpeakerA = idx % 2 === 0;
 
-          <TextInput
-            ref={typingInputRef}
-            style={styles.typingInput}
-            value={typedText}
-            onChangeText={(text) => {
-              // Prevent typing longer than the target text
-              if (text.length <= activeUtterance.text.length) {
-                setTypedText(text);
-              }
-            }}
-            placeholder="Type the dialogue exactly above..."
-            placeholderTextColor="#60646C"
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="off"
-          />
-
-          {isDialogueCompleted && selectedUtteranceIndex! < conversation.length - 1 && (
-            <Pressable onPress={handleNextUtterance} style={styles.nextLineButton}>
-              <ThemedText type="code" style={styles.nextLineButtonText}>
-                PRACTICE NEXT LINE →
-              </ThemedText>
-            </Pressable>
-          )}
-        </ThemedView>
-      )}
-
-      {/* SECTION 2: VOCABULARY MATCH & TYPE GAME */}
-      <View style={[styles.sectionHeader, { marginTop: Spacing.five }]}>
-        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.sectionLabel}>
-          SECTION 2 • VOCABULARY MATCHING CHALLENGE
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Type the correct word from the bank next to its meaning.
-        </ThemedText>
-      </View>
-
-      {/* Word Bank Display */}
-      <View style={styles.wordBankContainer}>
-        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.bankLabel}>
-          WORD BANK:
-        </ThemedText>
-        <View style={styles.wordBankGrid}>
-          {shuffledWords.map((word, idx) => {
-            // Check if word has been correctly matched
-            const isMatched = shuffledMeanings.some((item, mIdx) => {
-              return item.word.toLowerCase() === word.toLowerCase() && vocabCorrectStatus[mIdx];
-            });
-
-            return (
-              <View
-                key={`bank-word-${idx}`}
-                style={[
-                  styles.wordBankPill,
-                  isMatched && styles.wordBankPillMatched
-                ]}
-              >
-                <ThemedText
+              return (
+                <Pressable
+                  key={`convo-line-${idx}`}
+                  onPress={() => handleSelectUtterance(idx)}
                   style={[
-                    styles.wordBankText,
-                    isMatched && styles.wordBankTextMatched
+                    styles.dialogueRow,
+                    isSpeakerA ? styles.rowLeft : styles.rowRight,
                   ]}
                 >
-                  {word}
-                </ThemedText>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Matching Questions */}
-      <View style={styles.vocabList}>
-        {shuffledMeanings.map((item, idx) => {
-          const isCorrect = vocabCorrectStatus[idx];
-
-          return (
-            <ThemedView key={`vocab-match-${idx}`} type="backgroundElement" style={styles.vocabMatchCard}>
-              <View style={styles.vocabMeaningContainer}>
-                <ThemedText style={styles.meaningText}>
-                  • {item.meaning}
-                </ThemedText>
-              </View>
-
-              <View style={styles.vocabInputWrapper}>
-                <TextInput
-                  style={[
-                    styles.vocabInput,
-                    isCorrect && styles.vocabInputCorrect
-                  ]}
-                  value={vocabAnswers[idx] || ''}
-                  onChangeText={(text) => handleVocabAnswerChange(idx, text)}
-                  placeholder="Type word..."
-                  placeholderTextColor="#60646C"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isCorrect} // Lock input once matched correctly
-                />
-                {isCorrect && (
-                  <View style={styles.checkWrapper}>
-                    <ThemedText style={styles.checkText}>✓</ThemedText>
+                  <View
+                    style={[
+                      styles.bubble,
+                      isSpeakerA ? styles.bubbleLeft : styles.bubbleRight,
+                      isSelected && styles.bubbleSelected,
+                    ]}
+                  >
+                    <ThemedText style={styles.speakerName} themeColor="textSecondary">
+                      {utterance.speaker}
+                    </ThemedText>
+                    <ThemedText style={styles.bubbleText}>
+                      {utterance.text}
+                    </ThemedText>
                   </View>
-                )}
-              </View>
-            </ThemedView>
-          );
-        })}
-      </View>
+                </Pressable>
+              );
+            })}
+          </View>
 
-      {/* Game completion Card */}
-      {correctVocabCount === vocabulary.length ? (
-        <ThemedView type="backgroundElement" style={styles.vocabSuccessCard}>
-          <ThemedText type="subtitle" style={styles.successTitle}>
-            🏆 Match Challenge Complete!
-          </ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" style={styles.successDesc}>
-            Amazing! You typed and matched all vocabulary words correctly.
-          </ThemedText>
-          <Pressable onPress={resetVocabGame} style={styles.resetButton}>
-            <ThemedText type="code" style={styles.resetButtonText}>
-              PLAY AGAIN ↻
-            </ThemedText>
-          </Pressable>
-        </ThemedView>
+          {/* Dialogue Practice Modal Overlay */}
+          {activeUtterance && (
+            <Modal
+              visible={isPracticeModalOpen}
+              transparent={true}
+              animationType="fade"
+              onRequestClose={() => setIsPracticeModalOpen(false)}
+            >
+              <View style={styles.modalOverlay}>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                  style={styles.modalKeyboardAvoiding}
+                >
+                  <ThemedView type="backgroundSelected" style={styles.modalCard}>
+                    {/* Modal Header */}
+                    <View style={styles.modalHeader}>
+                      <ThemedText type="smallBold" style={styles.practiceTitle}>
+                        PRACTICING {activeUtterance.speaker.toUpperCase()}'S LINE
+                      </ThemedText>
+                      <Pressable
+                        onPress={() => setIsPracticeModalOpen(false)}
+                        style={({ pressed }) => [styles.closeModalButton, pressed && styles.pressed]}
+                      >
+                        <ThemedText style={styles.closeModalText}>✕</ThemedText>
+                      </Pressable>
+                    </View>
+
+                    {/* Character practice grid */}
+                    <View style={styles.targetDisplay}>
+                      {renderTypedCharacters()}
+                    </View>
+
+                    <TextInput
+                      ref={typingInputRef}
+                      style={styles.typingInput}
+                      value={typedText}
+                      onChangeText={(text) => {
+                        // Prevent typing longer than the target text
+                        if (text.length <= activeUtterance.text.length) {
+                          setTypedText(text);
+                        }
+                      }}
+                      placeholder="Type the dialogue exactly above..."
+                      placeholderTextColor="#60646C"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      autoComplete="off"
+                      autoFocus={true}
+                    />
+
+                    {isDialogueCompleted && (
+                      <View style={styles.completedWrapper}>
+                        <ThemedText type="smallBold" style={styles.completedTag}>
+                          ✓ PERFECT MATCH!
+                        </ThemedText>
+
+                        {selectedUtteranceIndex! < conversation.length - 1 ? (
+                          <Pressable onPress={handleNextUtterance} style={styles.nextLineButton}>
+                            <ThemedText type="code" style={styles.nextLineButtonText}>
+                              NEXT LINE →
+                            </ThemedText>
+                          </Pressable>
+                        ) : (
+                          <Pressable
+                            onPress={() => setIsPracticeModalOpen(false)}
+                            style={[styles.nextLineButton, { backgroundColor: '#4CAF50' }]}
+                          >
+                            <ThemedText type="code" style={[styles.nextLineButtonText, { color: '#FFFFFF' }]}>
+                              FINISH & CLOSE
+                            </ThemedText>
+                          </Pressable>
+                        )}
+                      </View>
+                    )}
+                  </ThemedView>
+                </KeyboardAvoidingView>
+              </View>
+            </Modal>
+          )}
+        </View>
       ) : (
-        <View style={styles.scoreContainer}>
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            SCORE: {correctVocabCount} / {vocabulary.length} MATCHED
-          </ThemedText>
+        <View>
+          <View style={styles.sectionHeader}>
+            <ThemedText type="smallBold" themeColor="textSecondary" style={styles.sectionLabel}>
+              VOCABULARY MATCHING CHALLENGE
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Type the correct word from the bank next to its meaning.
+            </ThemedText>
+          </View>
+
+          {/* Word Bank Display */}
+          <View style={styles.wordBankContainer}>
+            <ThemedText type="smallBold" themeColor="textSecondary" style={styles.bankLabel}>
+              WORD BANK:
+            </ThemedText>
+            <View style={styles.wordBankGrid}>
+              {shuffledWords.map((word, idx) => {
+                const isMatched = shuffledMeanings.some((item, mIdx) => {
+                  return item.word.toLowerCase() === word.toLowerCase() && vocabCorrectStatus[mIdx];
+                });
+
+                return (
+                  <View
+                    key={`bank-word-${idx}`}
+                    style={[
+                      styles.wordBankPill,
+                      isMatched && styles.wordBankPillMatched
+                    ]}
+                  >
+                    <ThemedText
+                      style={[
+                        styles.wordBankText,
+                        isMatched && styles.wordBankTextMatched
+                      ]}
+                    >
+                      {word}
+                    </ThemedText>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Matching Questions */}
+          <View style={styles.vocabList}>
+            {shuffledMeanings.map((item, idx) => {
+              const isCorrect = vocabCorrectStatus[idx];
+
+              return (
+                <ThemedView key={`vocab-match-${idx}`} type="backgroundElement" style={styles.vocabMatchCard}>
+                  <View style={styles.vocabMeaningContainer}>
+                    <ThemedText style={styles.meaningText}>
+                      • {item.meaning}
+                    </ThemedText>
+                  </View>
+
+                  <View style={styles.vocabInputWrapper}>
+                    <TextInput
+                      style={[
+                        styles.vocabInput,
+                        isCorrect && styles.vocabInputCorrect
+                      ]}
+                      value={vocabAnswers[idx] || ''}
+                      onChangeText={(text) => handleVocabAnswerChange(idx, text)}
+                      placeholder="Type word..."
+                      placeholderTextColor="#60646C"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      editable={!isCorrect} // Lock input once matched correctly
+                    />
+                    {isCorrect && (
+                      <View style={styles.checkWrapper}>
+                        <ThemedText style={styles.checkText}>✓</ThemedText>
+                      </View>
+                    )}
+                  </View>
+                </ThemedView>
+              );
+            })}
+          </View>
+
+          {/* Game completion Card */}
+          {correctVocabCount === vocabulary.length ? (
+            <ThemedView type="backgroundElement" style={styles.vocabSuccessCard}>
+              <ThemedText type="subtitle" style={styles.successTitle}>
+                🏆 Match Challenge Complete!
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" style={styles.successDesc}>
+                Amazing! You typed and matched all vocabulary words correctly.
+              </ThemedText>
+              <Pressable onPress={resetVocabGame} style={styles.resetButton}>
+                <ThemedText type="code" style={styles.resetButtonText}>
+                  PLAY AGAIN ↻
+                </ThemedText>
+              </Pressable>
+            </ThemedView>
+          ) : (
+            <View style={styles.scoreContainer}>
+              <ThemedText type="smallBold" themeColor="textSecondary">
+                SCORE: {correctVocabCount} / {vocabulary.length} MATCHED
+              </ThemedText>
+            </View>
+          )}
         </View>
       )}
 
@@ -345,7 +419,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
-    paddingBottom: Spacing.six + 80, // Padding to prevent bottom tab overlap
+    paddingBottom: Spacing.six + 80,
   },
   titleCard: {
     marginBottom: Spacing.four,
@@ -358,6 +432,33 @@ const styles = StyleSheet.create({
   convoTitle: {
     fontSize: 22,
     fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  subTabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#121314',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    borderRadius: 24,
+    padding: 4,
+    marginBottom: Spacing.four,
+  },
+  subTabButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+  },
+  activeSubTabButton: {
+    backgroundColor: '#2E3135',
+  },
+  subTabText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#B0B4BA',
+  },
+  activeSubTabText: {
     color: '#FFFFFF',
   },
   sectionHeader: {
@@ -403,10 +504,6 @@ const styles = StyleSheet.create({
   bubbleSelected: {
     borderColor: '#4285F4',
     borderWidth: 1.5,
-    shadowColor: '#4285F4',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
   },
   speakerName: {
     fontSize: 10,
@@ -419,40 +516,64 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#FFFFFF',
   },
-  practiceCard: {
-    padding: Spacing.three,
-    borderRadius: 12,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.four,
+  },
+  modalKeyboardAvoiding: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 500,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: '#2E3135',
-    backgroundColor: '#0F1011',
+    padding: Spacing.four,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 10,
   },
-  practiceHeader: {
+  modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.two,
+    marginBottom: Spacing.three,
   },
   practiceTitle: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#B0B4BA',
+    letterSpacing: 1,
   },
-  completedTag: {
-    fontSize: 10,
-    color: '#4CAF50',
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+  closeModalButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#1C1D1F',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeModalText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   targetDisplay: {
-    padding: 12,
+    padding: 14,
     backgroundColor: '#000000',
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#232527',
-    marginBottom: Spacing.two,
+    marginBottom: Spacing.three,
   },
   charContainer: {
     flexDirection: 'row',
@@ -478,7 +599,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   typingInput: {
-    height: 44,
+    height: 48,
     backgroundColor: '#1C1D1F',
     borderWidth: 1,
     borderColor: '#2E3135',
@@ -487,13 +608,31 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
   },
+  completedWrapper: {
+    marginTop: Spacing.three,
+    gap: Spacing.two,
+  },
+  completedTag: {
+    fontSize: 11,
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.12)',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
   nextLineButton: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.three,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   nextLineButtonText: {
     color: '#000000',
@@ -653,5 +792,8 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontStyle: 'italic',
     color: '#D0D4DA',
+  },
+  pressed: {
+    opacity: 0.6,
   },
 });

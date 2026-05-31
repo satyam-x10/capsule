@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CalendarView } from '@/components/CalendarView';
 import { ConvoPracticeView } from '@/components/ConvoPracticeView';
+import { DateNavigator } from '@/components/DateNavigator';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
@@ -15,7 +16,7 @@ import { ConvoData } from '@/types/capsule';
 import { formatDateString } from '@/utils/dateHelper';
 
 export default function HomeScreen() {
-  const [activeTab, setActiveTab] = useState<'topics' | 'communication'>('topics');
+  const [activeTab, setActiveTab] = useState<'home' | 'topics' | 'communication'>('home');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const now = new Date();
@@ -63,32 +64,51 @@ export default function HomeScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         {/* App Branding Header */}
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
-            <View style={styles.headerTextContainer}>
-              <ThemedText type="subtitle" style={styles.brandTitle}>
-                Hi, Satyam
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
-                Learn these today as of {formatDateString(selectedDate)}
-              </ThemedText>
+        {activeTab === 'home' && (
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.headerTextContainer}>
+                <ThemedText type="subtitle" style={styles.brandTitle}>
+                  Hi, Satyam
+                </ThemedText>
+                <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
+                  Learn these today as of {formatDateString(selectedDate)}
+                </ThemedText>
+              </View>
+              <Pressable
+                onPress={() => setShowCalendar(!showCalendar)}
+                style={({ pressed }) => [
+                  styles.calendarToggleButton,
+                  showCalendar && styles.calendarActiveButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <ThemedText style={[styles.calendarToggleText, showCalendar && styles.calendarActiveText]}>
+                  {showCalendar ? 'Close ✕' : '📅'}
+                </ThemedText>
+              </Pressable>
             </View>
-            <Pressable
-              onPress={() => setShowCalendar(!showCalendar)}
-              style={({ pressed }) => [
-                styles.calendarToggleButton,
-                showCalendar && styles.calendarActiveButton,
-                pressed && styles.pressed,
-              ]}
-            >
-              <ThemedText style={[styles.calendarToggleText, showCalendar && styles.calendarActiveText]}>
-                {showCalendar ? 'Close ✕' : '📅'}
-              </ThemedText>
-            </Pressable>
           </View>
-        </View>
+        )}
 
-        {showCalendar && (
+        {/* Topics Header */}
+        {activeTab === 'topics' && (
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <View style={styles.headerTextContainer}>
+                <ThemedText type="subtitle" style={styles.brandTitle}>
+                  Daily Topics
+                </ThemedText>
+                <ThemedText type="small" themeColor="textSecondary" style={styles.brandSubtitle}>
+                  Choose a category to start learning for {formatDateString(selectedDate)}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+        )}
+
+
+        {activeTab === 'home' && showCalendar && (
           <CalendarView
             selectedDate={selectedDate}
             onDateSelect={(date) => {
@@ -98,7 +118,19 @@ export default function HomeScreen() {
           />
         )}
 
-        {activeTab === 'communication' ? (
+        {activeTab === 'home' ? (
+          <View style={styles.homeTabContainer}>
+            <DateNavigator selectedDate={selectedDate} onDateChange={setSelectedDate} />
+            <View style={styles.welcomeContainer}>
+              <ThemedText type="subtitle" style={styles.welcomeTitle}>
+                Welcome to Capsule
+              </ThemedText>
+              <ThemedText type="default" themeColor="textSecondary" style={styles.welcomeText}>
+                Use the date navigator above to select a date. Then navigate to "Topics" to view daily learning cards, or "Communication" to practice speaking and learning new vocabulary for the selected date!
+              </ThemedText>
+            </View>
+          </View>
+        ) : activeTab === 'communication' ? (
           isConvoLoading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#FFFFFF" />
@@ -189,6 +221,24 @@ export default function HomeScreen() {
 
         {/* Floating Custom Bottom Tab Bar */}
         <View style={styles.tabBarContainer}>
+          <Pressable
+            onPress={() => setActiveTab('home')}
+            style={({ pressed }) => [
+              styles.tabButton,
+              activeTab === 'home' && styles.activeTabButton,
+              pressed && styles.tabBarPressed,
+            ]}
+          >
+            <ThemedText
+              style={[
+                styles.tabText,
+                activeTab === 'home' && styles.activeTabText,
+              ]}
+            >
+              Home
+            </ThemedText>
+          </Pressable>
+
           <Pressable
             onPress={() => setActiveTab('topics')}
             style={({ pressed }) => [
@@ -434,5 +484,29 @@ const styles = StyleSheet.create({
   blankTabText: {
     fontSize: 14,
     color: '#B0B4BA',
+  },
+  homeTabContainer: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'stretch',
+  },
+  welcomeContainer: {
+    padding: Spacing.four,
+    backgroundColor: '#0F1011',
+    borderWidth: 1,
+    borderColor: '#2E3135',
+    borderRadius: 16,
+    marginHorizontal: Spacing.four,
+    marginTop: Spacing.four,
+    gap: Spacing.two,
+  },
+  welcomeTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  welcomeText: {
+    fontSize: 14,
+    lineHeight: 22,
   },
 });
