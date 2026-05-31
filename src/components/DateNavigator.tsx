@@ -7,41 +7,52 @@ import { ThemedView } from './themed-view';
 interface DateNavigatorProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
-  availableDates: string[];
+  availableDates?: string[];
 }
 
-export function DateNavigator({ selectedDate, onDateChange, availableDates }: DateNavigatorProps) {
-  const currentIndex = availableDates.indexOf(selectedDate);
+export function DateNavigator({ selectedDate, onDateChange }: DateNavigatorProps) {
+  const getOffsetDate = (offset: number) => {
+    if (!selectedDate || !selectedDate.includes('-')) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-  const hasPrev = currentIndex > 0;
-  const hasNext = true;
-  // const hasNext = currentIndex < availableDates.length - 1;
+    const [yearStr, monthStr, dayStr] = selectedDate.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10) - 1;
+    const day = parseInt(dayStr, 10);
+
+    const date = new Date(year, month, day);
+    date.setDate(date.getDate() + offset);
+
+    const newYear = date.getFullYear();
+    const newMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const newDay = String(date.getDate()).padStart(2, '0');
+
+    return `${newYear}-${newMonth}-${newDay}`;
+  };
 
   const handlePrev = () => {
-    if (hasPrev) {
-      onDateChange(availableDates[currentIndex - 1]);
-    }
+    onDateChange(getOffsetDate(-1));
   };
 
   const handleNext = () => {
-    if (hasNext) {
-      onDateChange(availableDates[currentIndex + 1]);
-    }
+    onDateChange(getOffsetDate(1));
   };
-
 
   return (
     <ThemedView style={styles.container}>
       <Pressable
         onPress={handlePrev}
-        disabled={!hasPrev}
         style={({ pressed }) => [
           styles.button,
-          !hasPrev && styles.disabledButton,
-          pressed && hasPrev && styles.pressed,
+          pressed && styles.pressed,
         ]}
       >
-        <ThemedText style={styles.arrow} themeColor={hasPrev ? 'text' : 'textSecondary'}>
+        <ThemedText style={styles.arrow} themeColor="text">
           ←
         </ThemedText>
       </Pressable>
@@ -57,14 +68,12 @@ export function DateNavigator({ selectedDate, onDateChange, availableDates }: Da
 
       <Pressable
         onPress={handleNext}
-        disabled={!hasNext}
         style={({ pressed }) => [
           styles.button,
-          !hasNext && styles.disabledButton,
-          pressed && hasNext && styles.pressed,
+          pressed && styles.pressed,
         ]}
       >
-        <ThemedText style={styles.arrow} themeColor={hasNext ? 'text' : 'textSecondary'}>
+        <ThemedText style={styles.arrow} themeColor="text">
           →
         </ThemedText>
       </Pressable>
