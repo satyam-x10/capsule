@@ -1,82 +1,79 @@
-import React from 'react';
+import { Spacing } from '@/constants/theme';
+import { formatDateString } from '@/utils/dateHelper';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
-import { Spacing } from '@/constants/theme';
 
 interface DateNavigatorProps {
   selectedDate: string;
   onDateChange: (date: string) => void;
-  availableDates: string[];
+  availableDates?: string[];
 }
 
-export function DateNavigator({ selectedDate, onDateChange, availableDates }: DateNavigatorProps) {
-  const currentIndex = availableDates.indexOf(selectedDate);
-  
-  const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex < availableDates.length - 1;
+export function DateNavigator({ selectedDate, onDateChange }: DateNavigatorProps) {
+  const getOffsetDate = (offset: number) => {
+    if (!selectedDate || !selectedDate.includes('-')) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    const [yearStr, monthStr, dayStr] = selectedDate.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10) - 1;
+    const day = parseInt(dayStr, 10);
+
+    const date = new Date(year, month, day);
+    date.setDate(date.getDate() + offset);
+
+    const newYear = date.getFullYear();
+    const newMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const newDay = String(date.getDate()).padStart(2, '0');
+
+    return `${newYear}-${newMonth}-${newDay}`;
+  };
 
   const handlePrev = () => {
-    if (hasPrev) {
-      onDateChange(availableDates[currentIndex - 1]);
-    }
+    onDateChange(getOffsetDate(-1));
   };
 
   const handleNext = () => {
-    if (hasNext) {
-      onDateChange(availableDates[currentIndex + 1]);
-    }
-  };
-
-  // Format the date into a human readable format, e.g. "Wednesday, May 27, 2026"
-  const formatDate = (dateStr: string) => {
-    try {
-      const date = new Date(dateStr + 'T00:00:00');
-      return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateStr;
-    }
+    onDateChange(getOffsetDate(1));
   };
 
   return (
     <ThemedView style={styles.container}>
       <Pressable
         onPress={handlePrev}
-        disabled={!hasPrev}
         style={({ pressed }) => [
           styles.button,
-          !hasPrev && styles.disabledButton,
-          pressed && hasPrev && styles.pressed,
+          pressed && styles.pressed,
         ]}
       >
-        <ThemedText style={styles.arrow} themeColor={hasPrev ? 'text' : 'textSecondary'}>
+        <ThemedText style={styles.arrow} themeColor="text">
           ←
         </ThemedText>
       </Pressable>
 
       <View style={styles.dateLabelContainer}>
         <ThemedText type="smallBold" themeColor="textSecondary" style={styles.subtext}>
-          ENGINEERING CAPSULES FOR
+          DAILY ISSUE
         </ThemedText>
         <ThemedText type="default" style={styles.dateText}>
-          {formatDate(selectedDate)}
+          {formatDateString(selectedDate)}
         </ThemedText>
       </View>
 
       <Pressable
         onPress={handleNext}
-        disabled={!hasNext}
         style={({ pressed }) => [
           styles.button,
-          !hasNext && styles.disabledButton,
-          pressed && hasNext && styles.pressed,
+          pressed && styles.pressed,
         ]}
       >
-        <ThemedText style={styles.arrow} themeColor={hasNext ? 'text' : 'textSecondary'}>
+        <ThemedText style={styles.arrow} themeColor="text">
           →
         </ThemedText>
       </Pressable>
@@ -88,7 +85,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.four,
     borderBottomWidth: 1,
@@ -117,7 +114,7 @@ const styles = StyleSheet.create({
   },
   dateLabelContainer: {
     alignItems: 'center',
-    flex: 1,
+    marginHorizontal: Spacing.six,
   },
   subtext: {
     fontSize: 10,

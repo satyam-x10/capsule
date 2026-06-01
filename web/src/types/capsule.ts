@@ -36,3 +36,9 @@ export interface ConvoData {
   vocabulary: VocabularyWord[];
   takeaway: string;
 }
+
+export interface SectionInfo {
+  id: number;
+  name: string;
+  description: string;
+}
