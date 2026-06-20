@@ -1,0 +1,113 @@
+{
+    "title": "Planning a Surprise Party",
+    "theme": "Planning a Birthday Surprise",
+    "conversation": [
+        {
+            "speaker": "Eve",
+            "text": "We need to plan a surprise party for Leo. Let's make sure we are furtive about our meetings so he doesn't suspect anything."
+        },
+        {
+            "speaker": "Ava",
+            "text": "I agree. We'll need to conspire with his coworker to get him to the venue on time."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I've been diligent about listing all the guests and their RSVPs, so we have an accurate head count."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Great. Leo is always so exuberant; he's going to be absolutely thrilled and full of energy."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I'm a little apprehensive that someone might accidentally ruin the surprise beforehand, though."
+        },
+        {
+            "speaker": "Ava",
+            "text": "We just need to be circumspect and avoid discussing the plans in public places."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Leo isn't very gullible, so we have to make sure our cover story is extremely believable."
+        },
+        {
+            "speaker": "Ava",
+            "text": "The theme we chose is quite elaborate, but I think the decorations will look fantastic."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Yes, and a good music playlist is indispensable for setting the right party mood."
+        },
+        {
+            "speaker": "Ava",
+            "text": "If we tell him we're going to a boring business lecture on a Saturday night, that might sound a bit implausible."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Haha, true. Let's tell him we won tickets to a food festival instead. He loves food."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Perfect! He'll be jubilant to hear that, and it gets him to the venue in nice clothes."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Let's be prudent with our spending and check the budget once more before ordering the cake."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Sounds good. Let's make the call!"
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "furtive",
+            "meaning": "attempting to avoid notice or attention; secretive"
+        },
+        {
+            "word": "conspire",
+            "meaning": "make plans jointly or secretly, especially for a surprise or joint project"
+        },
+        {
+            "word": "diligent",
+            "meaning": "having or showing care and conscientiousness in one's tasks"
+        },
+        {
+            "word": "exuberant",
+            "meaning": "filled with or characterized by a lively energy and excitement"
+        },
+        {
+            "word": "apprehensive",
+            "meaning": "anxious or fearful that something bad or unexpected will happen"
+        },
+        {
+            "word": "circumspect",
+            "meaning": "wary and unwilling to take risks; cautious"
+        },
+        {
+            "word": "gullible",
+            "meaning": "easily persuaded to believe something; credulous"
+        },
+        {
+            "word": "elaborate",
+            "meaning": "involving many carefully arranged parts or details; detailed"
+        },
+        {
+            "word": "indispensable",
+            "meaning": "absolutely necessary"
+        },
+        {
+            "word": "implausible",
+            "meaning": "not seeming reasonable or probable; failing to convince"
+        },
+        {
+            "word": "jubilant",
+            "meaning": "feeling or expressing great happiness and triumph"
+        },
+        {
+            "word": "prudent",
+            "meaning": "acting with or showing care and thought for the future"
+        }
+    ],
+    "takeaway": "Organizing a surprise party requires diligent planning and circumspect communication to make sure the event remains a secret and turns out jubilant."
+}
