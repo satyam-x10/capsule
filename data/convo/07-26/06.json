@@ -1,0 +1,109 @@
+{
+    "title": "Managing the Weekly Budget",
+    "theme": "Shopping & Grocery Budgeting",
+    "conversation": [
+        {
+            "speaker": "Eve",
+            "text": "We really need to review our grocery spending. Lately, we've bought too many superfluous snacks that just sit in the cupboard."
+        },
+        {
+            "speaker": "Ava",
+            "text": "I agree. Let's make a pragmatic budget list and stick to it this time."
+        },
+        {
+            "speaker": "Eve",
+            "text": "If we want to change our habits, we can't maintain the status quo of just picking whatever looks good on the shelf."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Yes, and I prefer shopping in store rather than online. There's a tactile benefit to choosing the freshest produce ourselves."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Definitely. Seeing the final bill in hand gives us a tangible sense of how much we're actually spending."
+        },
+        {
+            "speaker": "Ava",
+            "text": "I'm always wary of those special 'buy one get one free' deals. They often tempt us into buying things we don't need."
+        },
+        {
+            "speaker": "Eve",
+            "text": "We should transition to buying bulk grains and beans; it's much cheaper in the long run."
+        },
+        {
+            "speaker": "Ava",
+            "text": "That will help alleviate our monthly financial stress quite a bit."
+        },
+        {
+            "speaker": "Eve",
+            "text": "The happiness from buying fancy imported cheese is so ephemeral—it lasts until the cheese is eaten, which is about two days!"
+        },
+        {
+            "speaker": "Ava",
+            "text": "Haha, so true. Organic labels are ubiquitous now, but we don't need to buy organic for everything."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I'll be fastidious about checking the price per ounce to ensure we get the best deal."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Excellent. Spending less than fifty dollars today would be a welcome anomaly compared to our usual trips."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Let's push our shopping cart in and get started!"
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "superfluous",
+            "meaning": "unnecessary, especially through being more than enough"
+        },
+        {
+            "word": "pragmatic",
+            "meaning": "dealing with things sensibly and realistically based on practical considerations"
+        },
+        {
+            "word": "status quo",
+            "meaning": "the existing state of affairs, especially regarding social or financial issues"
+        },
+        {
+            "word": "tactile",
+            "meaning": "perceptible by touch or related to the sense of touch"
+        },
+        {
+            "word": "tangible",
+            "meaning": "clear and definite; real; able to be physically touched"
+        },
+        {
+            "word": "wary",
+            "meaning": "feeling or showing caution about possible dangers or tricks"
+        },
+        {
+            "word": "transition",
+            "meaning": "the process of changing from one state, habit, or condition to another"
+        },
+        {
+            "word": "alleviate",
+            "meaning": "make a problem or suffering less severe; ease"
+        },
+        {
+            "word": "ephemeral",
+            "meaning": "lasting for a very short time; fleeting"
+        },
+        {
+            "word": "ubiquitous",
+            "meaning": "present, appearing, or found everywhere"
+        },
+        {
+            "word": "fastidious",
+            "meaning": "very attentive to and concerned about accuracy, detail, or cleanliness"
+        },
+        {
+            "word": "anomaly",
+            "meaning": "something that deviates from what is standard, normal, or expected"
+        }
+    ],
+    "takeaway": "Pragmatic shopping lists and being fastidious about pricing help alleviate unnecessary expenses and bring tangible savings to the household budget."
+}

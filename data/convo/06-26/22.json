@@ -1,0 +1,109 @@
+{
+    "title": "Running Late",
+    "theme": "Commuting & Public Transport Delays",
+    "conversation": [
+        {
+            "speaker": "Ava",
+            "text": "Did you hear about the subway delays? The morning train schedule is so volatile right now."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I know, we've only had sporadic updates on the app, leaving us guessing when the next train is coming."
+        },
+        {
+            "speaker": "Ava",
+            "text": "The crowd at the station platform was daunting. There must have been hundreds of people squeezed together."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I'm always wary of boarding those packed trains; it's so easy to drop your phone or bag."
+        },
+        {
+            "speaker": "Ava",
+            "text": "We had to transition to a bus route, which took twice as long."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I tried to emulate those people who read books calmly during commute delays, but I was too stressed."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Trying to stay calm is futile when you have an important meeting at nine."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Our boss has an implicit expectation that we should arrive on time, regardless of transit issues."
+        },
+        {
+            "speaker": "Ava",
+            "text": "True, though the inherent unpredictability of public transport should be taken into account."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Let's give him a lucid explanation of what happened so he understands it wasn't our fault."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Good idea. Any subsequent lateness this week might make us look unprofessional."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Yes, and a superficial apology won't cut it if it happens again. We should leave fifteen minutes earlier tomorrow."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Agreed. Let's head into the office now."
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "volatile",
+            "meaning": "liable to change rapidly and unpredictably"
+        },
+        {
+            "word": "sporadic",
+            "meaning": "occurring at irregular intervals or only in few places; scattered"
+        },
+        {
+            "word": "daunting",
+            "meaning": "seeming difficult to deal with in anticipation; intimidating"
+        },
+        {
+            "word": "wary",
+            "meaning": "feeling or showing caution about possible dangers or problems"
+        },
+        {
+            "word": "transition",
+            "meaning": "the process of changing from one state, route, or condition to another"
+        },
+        {
+            "word": "emulate",
+            "meaning": "imitate or copy, typically to match or surpass a standard of behavior"
+        },
+        {
+            "word": "futile",
+            "meaning": "pointing to an effort that is pointless or useless"
+        },
+        {
+            "word": "implicit",
+            "meaning": "implied though not plainly expressed; absolute and unquestioning"
+        },
+        {
+            "word": "inherent",
+            "meaning": "existing in something as a permanent, essential, or characteristic attribute"
+        },
+        {
+            "word": "lucid",
+            "meaning": "expressed clearly; easy to understand"
+        },
+        {
+            "word": "subsequent",
+            "meaning": "coming after something in time; following"
+        },
+        {
+            "word": "superficial",
+            "meaning": "existing or occurring only at the surface; not thorough or deep"
+        }
+    ],
+    "takeaway": "Commuting delays are stressful and volatile, but a lucid explanation and early planning help manage professional expectations."
+}

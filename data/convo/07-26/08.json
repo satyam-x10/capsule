@@ -1,0 +1,109 @@
+{
+    "title": "Dressing Up for a Wedding",
+    "theme": "Attending a Wedding / Party",
+    "conversation": [
+        {
+            "speaker": "Eve",
+            "text": "I need to choose a dress for Sarah's wedding. I want something with a classic, elegant aesthetic."
+        },
+        {
+            "speaker": "Ava",
+            "text": "You're always so fastidious about matching your accessories, Eve. But it always turns out great."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Well, a wedding is such an ephemeral event, but the pictures last forever, so I want to look my best!"
+        },
+        {
+            "speaker": "Ava",
+            "text": "True. Let's make sure we don't wear anything too garish. We don't want to draw attention away from the bride."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Of course. Wearing neutral or soft pastel colors is the status quo for these kinds of ceremonies anyway."
+        },
+        {
+            "speaker": "Ava",
+            "text": "I love the fabric of this silk dress. It has such a lovely, smooth tactile quality."
+        },
+        {
+            "speaker": "Eve",
+            "text": "That looks gorgeous! Watching Sarah walk down the aisle will be a profound moment for all of us."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Yes, though the ceremony itself is transient, the commitment they are making is for a lifetime."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I am a huge advocate for celebrating love, and Sarah and Mark are perfect for each other."
+        },
+        {
+            "speaker": "Ava",
+            "text": "They really are. Have you noticed the disparity between our friend group's styles? Some dress super casual, and others dress very formal."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Yes! But it's fun. I always try to emulate the elegance of the older generations, they dress so classily."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Indeed. I decided to buy a novel type of clutch bag that opens with a fingerprint sensor. Look!"
+        },
+        {
+            "speaker": "Eve",
+            "text": "Wow, high-tech fashion! Let's get dressed and get going."
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "aesthetic",
+            "meaning": "concerned with beauty or the appreciation of beauty"
+        },
+        {
+            "word": "fastidious",
+            "meaning": "very attentive to and concerned about accuracy and detail"
+        },
+        {
+            "word": "ephemeral",
+            "meaning": "lasting for a very short time; fleeting"
+        },
+        {
+            "word": "garish",
+            "meaning": "obtrusively bright and showy; lurid"
+        },
+        {
+            "word": "status quo",
+            "meaning": "the existing state of affairs, especially regarding social conventions"
+        },
+        {
+            "word": "tactile",
+            "meaning": "perceptible by touch or related to the sense of touch"
+        },
+        {
+            "word": "profound",
+            "meaning": "very great or intense; deeply meaningful"
+        },
+        {
+            "word": "transient",
+            "meaning": "lasting only for a short time; impermanent"
+        },
+        {
+            "word": "advocate",
+            "meaning": "a person who publicly supports or recommends a particular cause"
+        },
+        {
+            "word": "disparity",
+            "meaning": "a great difference or inequality"
+        },
+        {
+            "word": "emulate",
+            "meaning": "match or surpass a person or style, typically by imitation"
+        },
+        {
+            "word": "novel",
+            "meaning": "new or unusual in an interesting way"
+        }
+    ],
+    "takeaway": "Dressing up and celebrating major milestones with friends reminds us of the profound connections we share, despite our diverse individual styles."
+}

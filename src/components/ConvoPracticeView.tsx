@@ -487,10 +487,10 @@ export function ConvoPracticeView({ convo }: ConvoPracticeViewProps) {
       {/* Takeaway message */}
       <View style={styles.takeawayCard}>
         <ThemedText type="smallBold" style={styles.takeawayLabel} themeColor="textSecondary">
-          TODAY'S TAKEAWAY
+          {"TODAY'S TAKEAWAY"}
         </ThemedText>
         <ThemedText style={styles.takeawayText}>
-          "{takeaway}"
+          {"\""}{takeaway}{"\""}
         </ThemedText>
       </View>
     </ScrollView>

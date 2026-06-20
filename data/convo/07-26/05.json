@@ -1,0 +1,109 @@
+{
+    "title": "Discussing a New Thriller",
+    "theme": "Reviewing a Movie/TV Show",
+    "conversation": [
+        {
+            "speaker": "Ava",
+            "text": "Did you watch the finale of that new thriller show last night? The ending had some really profound themes about memory."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I did! But it felt a bit transient; the initial shock wore off so quickly."
+        },
+        {
+            "speaker": "Ava",
+            "text": "True. I'm a strong advocate for slow-burn storytelling, but this was a bit too fast-paced."
+        },
+        {
+            "speaker": "Eve",
+            "text": "I'm ambivalent about the main character's choices. Part of me understands him, but part of me thinks he's crazy."
+        },
+        {
+            "speaker": "Ava",
+            "text": "He was so capricious, changing his loyalties in every single episode."
+        },
+        {
+            "speaker": "Eve",
+            "text": "There was a huge disparity between how the critics rated it and how actual viewers felt."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Absolutely. I think the director tried to emulate classic noir films, but didn't quite capture the same mood."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Yes, though the inherent difficulty of modernizing that style is always going to be a challenge."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Still, the plot was lucid enough to follow easily, unlike other convoluted mystery shows."
+        },
+        {
+            "speaker": "Eve",
+            "text": "It definitely felt like a novel concept at first, even if it copied older tropes later on."
+        },
+        {
+            "speaker": "Ava",
+            "text": "By the end, all of their high-tech gadgets felt obsolete compared to simple human intuition."
+        },
+        {
+            "speaker": "Eve",
+            "text": "Haha, yes! I just wish they hadn't given us such a superficial explanation for the main mystery."
+        },
+        {
+            "speaker": "Ava",
+            "text": "Totally. Let's hope season two is written a bit better!"
+        }
+    ],
+    "vocabulary": [
+        {
+            "word": "profound",
+            "meaning": "very great or intense; having or showing great knowledge or insight"
+        },
+        {
+            "word": "transient",
+            "meaning": "lasting only for a short time; impermanent"
+        },
+        {
+            "word": "advocate",
+            "meaning": "a person who publicly supports or recommends a particular cause or policy"
+        },
+        {
+            "word": "ambivalent",
+            "meaning": "having mixed feelings or contradictory ideas about something or someone"
+        },
+        {
+            "word": "capricious",
+            "meaning": "given to sudden and unaccountable changes of mood or behavior"
+        },
+        {
+            "word": "disparity",
+            "meaning": "a great difference or inequality"
+        },
+        {
+            "word": "emulate",
+            "meaning": "imitate or copy, typically to match or surpass"
+        },
+        {
+            "word": "inherent",
+            "meaning": "existing in something as a permanent, essential, or characteristic attribute"
+        },
+        {
+            "word": "lucid",
+            "meaning": "expressed clearly; easy to understand"
+        },
+        {
+            "word": "novel",
+            "meaning": "new or unusual in an interesting way"
+        },
+        {
+            "word": "obsolete",
+            "meaning": "no longer produced or used; out of date"
+        },
+        {
+            "word": "superficial",
+            "meaning": "existing or occurring at or on the surface; not thorough or deep"
+        }
+    ],
+    "takeaway": "Critiquing media together helps us appreciate storytelling structures and articulate our ambivalent feelings toward creative works."
+}
