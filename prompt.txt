@@ -1,0 +1,35 @@
+Use the following context files to check which vocabulary words and capsule topics have already been used. Do NOT reuse any words or topics listed in these files:
+- data/context/convo_words.json (List of already taught words)
+- data/context/section1.json (AI & Emerging Technology topics)
+- data/context/section2.json (Software Engineering Fundamentals topics)
+- data/context/section3.json (Product & Business topics)
+- data/context/section4.json (Communication & Leadership topics)
+- data/context/section5.json (Wealth & Life Management topics)
+- data/context/section6.json (Human Knowledge topics)
+
+TASK:
+1. Generate new daily JSON files for both capsules and convo.
+2. Generate the UPDATED versions of the context files (convo_words.json and section1-6.json) with your newly generated words and topics appended to them so they are updated for next time.
+
+CONSTRAINTS:
+1. Convo JSON files (data/convo/<MM-YY>/<DD>.json):
+   - Schema: { "title": "...", "theme": "...", "conversation": [{"speaker": "Ava", "text": "..."}, {"speaker": "Eve", "text": "..."}], "vocabulary": [{"word": "...", "meaning": "..."}], "takeaway": "..." }
+   - Maximum 5 vocabulary words per conversation. Ensure only these 5 hard words are taught and highlighted.
+2. Capsules JSON files (data/capsules/<MM-YY>/<DD>.json):
+   - Schema: [{ "id": "...", "sectionId": <1-6>, "category": "...", "title": "...", "shortDescription": "...", "content": "...", "takeaway": "...", "readTime": "...", "date": "..." }]
+   - Generate exactly 5 capsules per day, picking 5 out of the 6 sections (rotate the skipped category day-by-day).
+   - Each capsule content must be extremely short: maximum 2-3 paragraphs. No fluff.
+
+Please generate content for [USER: Specify number of days, e.g. 5 days] starting from [USER: Specify start date YYYY-MM-DD] to [USER: Specify end date YYYY-MM-DD].
+
+OUTPUT FORMAT:
+Provide the JSON objects clearly inside markdown blocks with the suggested file paths:
+- data/convo/<MM-YY>/<DD>.json
+- data/capsules/<MM-YY>/<DD>.json
+- data/context/convo_words.json
+- data/context/section1.json
+- data/context/section2.json
+- data/context/section3.json
+- data/context/section4.json
+- data/context/section5.json
+- data/context/section6.json

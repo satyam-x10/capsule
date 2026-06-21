@@ -1,0 +1,18 @@
+[
+  "AI Agents: When Language Models Learn to Use Tools",
+  "AI Safety & Alignment: Ensuring AI Systems Do What We Actually Want",
+  "Diffusion Models: How AI Generates Images from Noise",
+  "Fine-Tuning Strategies: LoRA, QLoRA, and Efficient Model Adaptation",
+  "Knowledge Distillation: Teaching Small Models to Think Like Big Ones",
+  "LLM Inference Optimization: Making Models Fast Enough for Production",
+  "Mixture of Experts: How Models Get Bigger Without Getting Slower",
+  "Model Quantization: Running Trillion-Parameter Models on Consumer Hardware",
+  "Multimodal AI: When Models See, Hear, and Read Simultaneously",
+  "Prompt Engineering: The Art of Communicating Effectively with AI",
+  "RAG: Giving Language Models Access to Real-Time Knowledge",
+  "RLHF: Teaching AI What Humans Actually Want",
+  "Self-Attention: How Language Models Understand Context",
+  "Tokenization & BPE: How LLMs See Language",
+  "Transformer Architecture: The Engine Behind Modern AI",
+  "Vector Databases: The Infrastructure Behind Semantic Search"
+]
